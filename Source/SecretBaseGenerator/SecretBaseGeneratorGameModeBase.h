@@ -7,11 +7,15 @@
 #include "SecretBaseGeneratorGameModeBase.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class SECRETBASEGENERATOR_API ASecretBaseGeneratorGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+
+	ASecretBaseGeneratorGameModeBase();
+
+	virtual void StartPlay() override;
+
 };
