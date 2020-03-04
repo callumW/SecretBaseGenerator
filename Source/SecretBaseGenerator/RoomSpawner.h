@@ -2,11 +2,9 @@
 
 #pragma once
 
-<<<<<<< HEAD
+
 #include <vector>
 
-=======
->>>>>>> 9d9faa738f2dd08ce825260b9381d8f7a6ab2c01
 #include "Room.h"
 
 #include "CoreMinimal.h"
