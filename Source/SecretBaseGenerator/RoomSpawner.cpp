@@ -20,7 +20,13 @@ void ARoomSpawner::BeginPlay()
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Room Spawner online!"));
 	}
 
-	room = (ARoom*) GetWorld()->SpawnActor(ARoom::StaticClass());
+	rooms.push_back((ARoom*) GetWorld()->SpawnActor(ARoom::StaticClass()));
+
+	rooms[0]->SetActorLocation(FVector(3.0f, 3.0f, 30.0f), false);
+
+	rooms.push_back((ARoom*) GetWorld()->SpawnActor(ARoom::StaticClass()));
+
+	rooms[1]->SetActorLocation(FVector(3.0f, 53.0f, 30.0f), false);
 }
 
 // Called every frame

@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <vector>
+
 #include "Room.h"
 
 #include "CoreMinimal.h"
@@ -26,5 +28,5 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
-	ARoom* room = nullptr;
+	std::vector<ARoom*> rooms;
 };
