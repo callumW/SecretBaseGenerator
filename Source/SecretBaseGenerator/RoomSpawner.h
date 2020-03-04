@@ -31,9 +31,5 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
-<<<<<<< HEAD
 	std::vector<ARoom*> rooms;
-=======
-	ARoom* room = nullptr;
->>>>>>> 9d9faa738f2dd08ce825260b9381d8f7a6ab2c01
 };
