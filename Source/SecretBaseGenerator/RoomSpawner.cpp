@@ -28,16 +28,26 @@ void ARoomSpawner::BeginPlay()
 	for (auto & loc : room_locations) {
 		FVector location(loc.first * xOffset, loc.second * yOffset, 0.0f);
 		AActor* tmp = GetWorld()->SpawnActor(ARoom::StaticClass());
+		tmp->SetActorLocation(location);
 		rooms.Add((ARoom*) tmp);
 	}
 }
 
-std::vector<std::pair<float, float>> ARoomSpawner::GetRoomLocations()
+std::set<std::pair<float, float>> ARoomSpawner::GetRoomLocations()
 {
-	std::vector<std::pair<float, float>> ret;
-	for (uint8 x = 0; x < width; x++) {
-		for (uint8 y = 0; y < height; y++) {
-			ret.push_back(std::make_pair<float, float>((float) x, (float) y));
+	std::set<std::pair<float, float>> ret;
+	ret.insert(std::make_pair<float, float>(0.0f, 0.0f));	// add origin so player doesn't fall!
+
+	uint8 count = 1;
+	while (count <= num_rooms) {
+		float randomX, randomY;
+		randomX = FMath::RandRange(0, width - 1);
+		randomY = FMath::RandRange(0, height - 1);
+
+		auto it = ret.insert(std::make_pair<float, float>((float) randomX, (float) randomY));
+		if (it.second) {	// successfully added location
+			UE_LOG(LogTemp, Warning, TEXT("Added room: %f, %f to create mesh asset"), (float) randomX, (float) randomY);
+			count++;
 		}
 	}
 

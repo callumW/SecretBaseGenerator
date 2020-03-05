@@ -2,8 +2,8 @@
 
 #pragma once
 
-
-#include <vector>
+#include <utility>
+#include <set>
 
 #include "Room.h"
 
@@ -26,6 +26,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	uint8 height = 10;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	uint8 num_rooms = 10;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -36,7 +39,7 @@ public:
 
 private:
 
-	std::vector<std::pair<float, float>> GetRoomLocations();
+	std::set<std::pair<float, float>> GetRoomLocations();
 
 	TArray<ARoom*> rooms;
 };
