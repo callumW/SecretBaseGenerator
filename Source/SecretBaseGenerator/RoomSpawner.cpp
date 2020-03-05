@@ -22,11 +22,9 @@ void ARoomSpawner::BeginPlay()
 
 	rooms.push_back((ARoom*) GetWorld()->SpawnActor(ARoom::StaticClass()));
 
-	rooms[0]->SetActorLocation(FVector(3.0f, 3.0f, 30.0f), false);
-
 	rooms.push_back((ARoom*) GetWorld()->SpawnActor(ARoom::StaticClass()));
 
-	rooms[1]->SetActorLocation(FVector(3.0f, 53.0f, 30.0f), false);
+	rooms[1]->SetActorLocation(FVector(0.0f, 1000.0f, 0.0f));
 }
 // Called every frame
 void ARoomSpawner::Tick(float DeltaTime)

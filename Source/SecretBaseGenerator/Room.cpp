@@ -17,7 +17,7 @@ ARoom::ARoom()
 
 	mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("room mesh"));
 
-	ConstructorHelpers::FObjectFinder<UStaticMesh> mesh_asset(TEXT("StaticMesh'/Game/Models/tombstone.tombstone'"));
+	ConstructorHelpers::FObjectFinder<UStaticMesh> mesh_asset(TEXT("StaticMesh'/Game/Models/room.room'"));
 
 	if (mesh_asset.Succeeded()) {
 		mesh->SetStaticMesh(mesh_asset.Object);
