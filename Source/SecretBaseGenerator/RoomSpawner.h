@@ -20,6 +20,12 @@ public:
 	// Sets default values for this actor's properties
 	ARoomSpawner();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	uint8 width = 10;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	uint8 height = 10;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
