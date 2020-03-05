@@ -11,10 +11,6 @@ ARoom::ARoom()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
-	if (GEngine) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Constructed Room"));
-	}
-
 	mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("room mesh"));
 
 	ConstructorHelpers::FObjectFinder<UStaticMesh> mesh_asset(TEXT("StaticMesh'/Game/Models/room.room'"));
@@ -32,10 +28,6 @@ ARoom::ARoom()
 void ARoom::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (GEngine) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Room BeginPlay()"));
-	}
 }
 
 // Called every frame

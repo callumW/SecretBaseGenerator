@@ -32,11 +32,6 @@ void ARoomSpawner::BeginPlay()
 		}
 	}
 
-	// rooms.Add((ARoom*) GetWorld()->SpawnActor(ARoom::StaticClass()));
-	//
-	// rooms.Add((ARoom*) GetWorld()->SpawnActor(ARoom::StaticClass()));
-	//
-	// rooms[1]->SetActorLocation(FVector(0.0f, 1000.0f, 0.0f));
 }
 // Called every frame
 void ARoomSpawner::Tick(float DeltaTime)
