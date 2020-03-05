@@ -29,5 +29,5 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
-	std::vector<ARoom*> rooms;
+	TArray<ARoom*> rooms;
 };
