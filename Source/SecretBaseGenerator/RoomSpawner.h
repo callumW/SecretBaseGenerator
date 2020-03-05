@@ -35,5 +35,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
+
+	std::vector<std::pair<float, float>> GetRoomLocations();
+
 	TArray<ARoom*> rooms;
 };
