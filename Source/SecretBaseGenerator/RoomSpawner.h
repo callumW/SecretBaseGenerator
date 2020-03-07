@@ -30,6 +30,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	uint8 num_rooms = 10;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 seed = 0;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

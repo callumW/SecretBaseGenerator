@@ -46,7 +46,7 @@ static bool contains(std::vector<std::pair<float, float>> const& vec, std::pair<
 ESet<std::pair<float, float>>  ARoomSpawner::GetRoomLocations()
 {
 	ESet<std::pair<float, float>> room_set;
-	ESet<std::pair<float, float>> adjacent_room_set;
+	ESet<std::pair<float, float>> adjacent_room_set{(unsigned) seed};
 	room_set.insert(std::make_pair<float, float>(0.0f, 0.0f));	// add origin so player doesn't fall!
 
 	adjacent_room_set.insert(std::make_pair<float, float>(1.0f, 0.0f));

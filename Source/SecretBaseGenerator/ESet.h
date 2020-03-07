@@ -17,6 +17,8 @@ class SECRETBASEGENERATOR_API ESet
 {
 public:
 
+	ESet(unsigned seed = 0):m_seed(seed) { m_rand_engine.seed(m_seed); }
+
 	void set_seed(unsigned seed);
 
 	bool insert(T const& obj) { return m_set.insert(obj).second; }
@@ -47,7 +49,7 @@ public:
 
 protected:
 	std::set<T> m_set;
-	unsigned seed = 0;
+	unsigned m_seed;
 
 	std::mt19937 m_rand_engine;
 };
