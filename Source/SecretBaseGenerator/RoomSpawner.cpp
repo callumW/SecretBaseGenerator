@@ -33,25 +33,57 @@ void ARoomSpawner::BeginPlay()
 	}
 }
 
-std::set<std::pair<float, float>> ARoomSpawner::GetRoomLocations()
+static bool contains(std::vector<std::pair<float, float>> const& vec, std::pair<float, float> const& needle)
 {
-	std::set<std::pair<float, float>> ret;
-	ret.insert(std::make_pair<float, float>(0.0f, 0.0f));	// add origin so player doesn't fall!
+	for (auto const& ele : vec) {
+		if (ele.first == needle.first && ele.second == needle.second) {
+			return true;
+		}
+	}
+	return false;
+}
+
+ESet<std::pair<float, float>>  ARoomSpawner::GetRoomLocations()
+{
+	ESet<std::pair<float, float>> room_set;
+	ESet<std::pair<float, float>> adjacent_room_set;
+	room_set.insert(std::make_pair<float, float>(0.0f, 0.0f));	// add origin so player doesn't fall!
+
+	adjacent_room_set.insert(std::make_pair<float, float>(1.0f, 0.0f));
+	adjacent_room_set.insert(std::make_pair<float, float>(0.0f, 1.0f));
 
 	uint8 count = 1;
 	while (count <= num_rooms) {
-		float randomX, randomY;
-		randomX = FMath::RandRange(0, width - 1);
-		randomY = FMath::RandRange(0, height - 1);
+		// pick random room
+		auto current_room = adjacent_room_set.get_random();
+		adjacent_room_set.erase(current_room);
 
-		auto it = ret.insert(std::make_pair<float, float>((float) randomX, (float) randomY));
-		if (it.second) {	// successfully added location
-			UE_LOG(LogTemp, Warning, TEXT("Added room: %f, %f to create mesh asset"), (float) randomX, (float) randomY);
-			count++;
+		room_set.insert(current_room);
+
+		// calculate adjacent rooms
+		std::vector<std::pair<float,float>> adjacents = {
+			{current_room.first, current_room.second-1},
+			{current_room.first-1, current_room.second},
+			{current_room.first+1, current_room.second},
+			{current_room.first, current_room.second+1},
+		};
+
+		// add to adjacent room list
+		for (auto & r : adjacents) {
+			if (r.first >= 0 && r.second >= 0) {
+				if (r.first < width, r.second < height) {
+					adjacent_room_set.insert(r);
+				}
+			}
 		}
+
+
+		room_set.insert(current_room);
+		UE_LOG(LogTemp, Warning, TEXT("Added room: %f, %f to create mesh asset"), current_room.first, current_room.second);
+		count++;
 	}
 
-	return ret;
+	return room_set;
 }
 
 // Called every frame

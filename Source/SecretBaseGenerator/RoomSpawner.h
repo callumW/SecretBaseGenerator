@@ -6,6 +6,7 @@
 #include <set>
 
 #include "Room.h"
+#include "ESet.h"
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
@@ -39,7 +40,7 @@ public:
 
 private:
 
-	std::set<std::pair<float, float>> GetRoomLocations();
+	ESet<std::pair<float, float>>  GetRoomLocations();
 
 	TArray<ARoom*> rooms;
 };
