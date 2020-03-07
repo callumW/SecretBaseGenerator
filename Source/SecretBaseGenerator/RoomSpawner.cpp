@@ -70,13 +70,10 @@ ESet<std::pair<float, float>>  ARoomSpawner::GetRoomLocations()
 
 		// add to adjacent room list
 		for (auto & r : adjacents) {
-			if (r.first >= 0 && r.second >= 0) {
-				if (r.first < width, r.second < height) {
-					adjacent_room_set.insert(r);
-				}
+			if (!room_set.contains(r)) {
+				adjacent_room_set.insert(r);
 			}
 		}
-
 
 		room_set.insert(current_room);
 		UE_LOG(LogTemp, Warning, TEXT("Added room: %f, %f to create mesh asset"), current_room.first, current_room.second);

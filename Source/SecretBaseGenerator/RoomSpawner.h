@@ -22,12 +22,6 @@ public:
 	ARoomSpawner();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	uint8 width = 10;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	uint8 height = 10;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	uint8 num_rooms = 10;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

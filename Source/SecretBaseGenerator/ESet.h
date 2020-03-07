@@ -27,7 +27,7 @@ public:
 	auto begin() { return m_set.begin(); }
 	auto end() { return m_set.end(); }
 
-	bool contains(T const& obj) { return m_set.end() == m_set.find(obj); }
+	bool contains(T const& obj) { return m_set.end() != m_set.find(obj); }
 
 	T get_random()
 	{
