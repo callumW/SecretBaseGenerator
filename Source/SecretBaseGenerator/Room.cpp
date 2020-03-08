@@ -25,10 +25,10 @@ ARoom::ARoom()
 		}
 	}
 
-	LoadWall(FVector(0.0f, -500.0f, 137.5f), FRotator(0.0f, -90.0f, 0.0f), "left wall");
-	LoadWall(FVector(0.0f, 500.0f, 137.5f), FRotator(0.0f, 90.0f, 0.0f), "right wall");
-	LoadWall(FVector(500.0f, 0.0f, 137.5f), FRotator(0.0f, 0.0f, 0.0f), "front wall");
-	LoadWall(FVector(-500.0f, 0.0f, 137.5f), FRotator(0.0f, 180.0f, 0.0f), "back wall");
+	LoadWall(FVector(0.0f, -495.0f, 137.5f), FRotator(0.0f, 90.0f, 0.0f), "left wall");
+	LoadWall(FVector(0.0f, 495.0f, 137.5f), FRotator(0.0f, -90.0f, 0.0f), "right wall");
+	LoadWall(FVector(495.0f, 0.0f, 137.5f), FRotator(0.0f, 180.0f, 0.0f), "front wall");
+	LoadWall(FVector(-495.0f, 0.0f, 137.5f), FRotator(0.0f, 0.0f, 0.0f), "back wall");
 }
 
 void ARoom::LoadFloor()
