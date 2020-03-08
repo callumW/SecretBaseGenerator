@@ -24,5 +24,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
-	UStaticMeshComponent* mesh = nullptr;
+	void LoadFloor();
+	void LoadWall(FVector loc, FRotator rotation, FName name);
+
+	TArray<UStaticMeshComponent*> meshes;
 };
