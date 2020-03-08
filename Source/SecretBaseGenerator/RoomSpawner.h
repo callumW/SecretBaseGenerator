@@ -27,6 +27,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 seed = 0;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float height = 0.0f;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
