@@ -12,7 +12,7 @@
 /**
  * Extensiond of std::set that provides access to a random element
  */
-template <class T>
+template <class T, class Compare = std::less<T>>
 class SECRETBASEGENERATOR_API ESet
 {
 public:
@@ -48,7 +48,7 @@ public:
 	}
 
 protected:
-	std::set<T> m_set;
+	std::set<T, Compare> m_set;
 	unsigned m_seed;
 
 	std::mt19937 m_rand_engine;

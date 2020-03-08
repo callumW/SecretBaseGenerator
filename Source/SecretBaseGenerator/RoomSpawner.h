@@ -3,7 +3,6 @@
 #pragma once
 
 #include <utility>
-#include <set>
 
 #include "Room.h"
 #include "ESet.h"
@@ -40,7 +39,7 @@ public:
 
 private:
 
-	ESet<std::pair<float, float>>  GetRoomLocations();
+	ESet<RoomBlock, RoomBlockSetLessThan>  GetRoomLocations();
 
 	TArray<ARoom*> rooms;
 };

@@ -26,31 +26,22 @@ void ARoomSpawner::BeginPlay()
 	auto room_locations = GetRoomLocations();
 
 	for (auto & loc : room_locations) {
-		FVector location(loc.first * xOffset, loc.second * yOffset, height);
-		AActor* tmp = GetWorld()->SpawnActor(ARoom::StaticClass());
+		FVector location(loc.x * xOffset, loc.y * yOffset, height);
+		ARoom* tmp = (ARoom*) GetWorld()->SpawnActor(ARoom::StaticClass());
+		// tmp->Initialize(loc);
 		tmp->SetActorLocation(location);
-		rooms.Add((ARoom*) tmp);
+		rooms.Add(tmp);
 	}
 }
 
-static bool contains(std::vector<std::pair<float, float>> const& vec, std::pair<float, float> const& needle)
+ESet<RoomBlock, RoomBlockSetLessThan>  ARoomSpawner::GetRoomLocations()
 {
-	for (auto const& ele : vec) {
-		if (ele.first == needle.first && ele.second == needle.second) {
-			return true;
-		}
-	}
-	return false;
-}
+	ESet<RoomBlock, RoomBlockSetLessThan> room_set;
+	ESet<RoomBlock, RoomBlockSetLessThan> adjacent_room_set{(unsigned) seed};
+	room_set.insert(RoomBlock(0.0f, 0.0f));	// add origin so player doesn't fall!
 
-ESet<std::pair<float, float>>  ARoomSpawner::GetRoomLocations()
-{
-	ESet<std::pair<float, float>> room_set;
-	ESet<std::pair<float, float>> adjacent_room_set{(unsigned) seed};
-	room_set.insert(std::make_pair<float, float>(0.0f, 0.0f));	// add origin so player doesn't fall!
-
-	adjacent_room_set.insert(std::make_pair<float, float>(1.0f, 0.0f));
-	adjacent_room_set.insert(std::make_pair<float, float>(0.0f, 1.0f));
+	adjacent_room_set.insert(RoomBlock(1.0f, 0.0f));
+	adjacent_room_set.insert(RoomBlock(0.0f, 1.0f));
 
 	uint8 count = 1;
 	while (count <= num_rooms) {
@@ -61,11 +52,11 @@ ESet<std::pair<float, float>>  ARoomSpawner::GetRoomLocations()
 		room_set.insert(current_room);
 
 		// calculate adjacent rooms
-		std::vector<std::pair<float,float>> adjacents = {
-			{current_room.first, current_room.second-1},
-			{current_room.first-1, current_room.second},
-			{current_room.first+1, current_room.second},
-			{current_room.first, current_room.second+1},
+		std::vector<RoomBlock> adjacents = {
+			{current_room.x, current_room.y-1},
+			{current_room.x-1, current_room.y},
+			{current_room.x+1, current_room.y},
+			{current_room.x, current_room.y+1},
 		};
 
 		// add to adjacent room list
@@ -76,7 +67,7 @@ ESet<std::pair<float, float>>  ARoomSpawner::GetRoomLocations()
 		}
 
 		room_set.insert(current_room);
-		UE_LOG(LogTemp, Warning, TEXT("Added room: %f, %f to create mesh asset"), current_room.first, current_room.second);
+		UE_LOG(LogTemp, Warning, TEXT("Added room: %f, %f to create mesh asset"), current_room.x, current_room.y);
 		count++;
 	}
 

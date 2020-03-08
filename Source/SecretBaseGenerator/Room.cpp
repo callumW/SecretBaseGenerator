@@ -27,26 +27,28 @@ ARoom::ARoom()
 		}
 	}
 
-	LoadWall(FVector(0.0f, -495.0f, 137.5f), FRotator(0.0f, 90.0f, 0.0f), "left wall");
-	LoadWall(FVector(0.0f, 495.0f, 137.5f), FRotator(0.0f, -90.0f, 0.0f), "right wall");
-	LoadWall(FVector(495.0f, 0.0f, 137.5f), FRotator(0.0f, 180.0f, 0.0f), "front wall");
-	LoadWall(FVector(-495.0f, 0.0f, 137.5f), FRotator(0.0f, 0.0f, 0.0f), "back wall");
-
-	LoadCeiling();
-	LoadLight();
+	Initialize(RoomBlock(0.0f, 0.0f));
 }
 
-void ARoom::LoadFloor()
-{
-
-}
-
-void ARoom::LoadWall(FVector loc, FRotator rotation, FName name)
+void ARoom::LoadWall(FVector loc, FRotator rotation, FName name, WALL_TYPE const type)
 {
 	auto wall_mesh = CreateDefaultSubobject<UStaticMeshComponent>(name);
 	meshes.Add(wall_mesh);
 
-	ConstructorHelpers::FObjectFinder<UStaticMesh> mesh_asset(TEXT("StaticMesh'/Game/Models/wall_door.wall_door'"));
+	TCHAR const * mesh_name = nullptr;
+
+	switch(type) {
+		case WALL_TYPE::WALL:
+			mesh_name = TEXT("StaticMesh'/Game/Models/wall.wall'");
+			break;
+		case WALL_TYPE::DOOR:
+			mesh_name = TEXT("StaticMesh'/Game/Models/wall_door.wall_door'");
+			break;
+		default:
+			mesh_name = TEXT("StaticMesh'/Game/Models/wall_door.wall_door'");
+	}
+
+	ConstructorHelpers::FObjectFinder<UStaticMesh> mesh_asset(mesh_name);
 
 	if (mesh_asset.Succeeded()) {
 		wall_mesh->SetStaticMesh(mesh_asset.Object);
@@ -101,6 +103,17 @@ void ARoom::LoadLight()
 	}
 
 	light->SetRelativeLocation(FVector(0.0f, 0.0f, 235.0f), false);
+}
+
+void ARoom::Initialize(RoomBlock const& block)
+{
+	LoadWall(FVector(495.0f, 0.0f, 137.5f), FRotator(0.0f, 180.0f, 0.0f), "front wall", block.walls[0]);
+	LoadWall(FVector(0.0f, 495.0f, 137.5f), FRotator(0.0f, -90.0f, 0.0f), "right wall", block.walls[1]);
+	LoadWall(FVector(-495.0f, 0.0f, 137.5f), FRotator(0.0f, 0.0f, 0.0f), "back wall", block.walls[2]);
+	LoadWall(FVector(0.0f, -495.0f, 137.5f), FRotator(0.0f, 90.0f, 0.0f), "left wall", block.walls[3]);
+
+	LoadCeiling();
+	LoadLight();
 }
 
 // Called when the game starts or when spawned

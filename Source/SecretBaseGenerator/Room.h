@@ -6,6 +6,41 @@
 #include "GameFramework/Actor.h"
 #include "Room.generated.h"
 
+
+enum class WALL_TYPE
+{
+	WALL,
+	DOOR
+};
+
+typedef struct RoomBlock
+{
+	float x = 0.0f;
+	float y = 0.0f;
+	WALL_TYPE walls[4] = {WALL_TYPE::WALL};
+
+	RoomBlock(float x_val, float y_val)
+	{
+		x = x_val;
+		y = y_val;
+	}
+
+	bool operator==(RoomBlock const& right) const
+	{
+		return (x == right.x && y == right.y);
+	}
+
+} RoomBlock;
+
+struct RoomBlockSetLessThan
+{
+	bool operator()(RoomBlock const& left, RoomBlock const& right) const
+	{
+		return (left.x < right.x || left.y < right.y);
+	}
+};
+
+
 UCLASS()
 class SECRETBASEGENERATOR_API ARoom : public AActor
 {
@@ -14,6 +49,8 @@ class SECRETBASEGENERATOR_API ARoom : public AActor
 public:
 	// Sets default values for this actor's properties
 	ARoom();
+
+	void Initialize(RoomBlock const& block);
 
 protected:
 	// Called when the game starts or when spawned
@@ -24,8 +61,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
-	void LoadFloor();
-	void LoadWall(FVector loc, FRotator rotation, FName name);
+	void LoadWall(FVector loc, FRotator rotation, FName name, WALL_TYPE const type);
 	void LoadCeiling();
 	void LoadLight();
 
