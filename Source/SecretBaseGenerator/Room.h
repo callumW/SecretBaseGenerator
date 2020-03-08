@@ -26,6 +26,8 @@ public:
 private:
 	void LoadFloor();
 	void LoadWall(FVector loc, FRotator rotation, FName name);
+	void LoadCeiling();
+	void LoadLight();
 
-	TArray<UStaticMeshComponent*> meshes;
+	TArray<USceneComponent*> meshes;
 };
