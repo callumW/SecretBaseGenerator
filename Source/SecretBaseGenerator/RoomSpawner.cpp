@@ -28,7 +28,7 @@ void ARoomSpawner::BeginPlay()
 	for (auto & loc : room_locations) {
 		FVector location(loc.x * xOffset, loc.y * yOffset, height);
 		ARoom* tmp = (ARoom*) GetWorld()->SpawnActor(ARoom::StaticClass());
-		// tmp->Initialize(loc);
+		tmp->Initialize(loc);
 		tmp->SetActorLocation(location);
 		rooms.Add(tmp);
 	}

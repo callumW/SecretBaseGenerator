@@ -27,12 +27,12 @@ ARoom::ARoom()
 		}
 	}
 
-	Initialize(RoomBlock(0.0f, 0.0f));
+	// Initialize(RoomBlock(0.0f, 0.0f));
 }
 
 void ARoom::LoadWall(FVector loc, FRotator rotation, FName name, WALL_TYPE const type)
 {
-	auto wall_mesh = CreateDefaultSubobject<UStaticMeshComponent>(name);
+	auto wall_mesh = NewObject<UStaticMeshComponent>(this, UStaticMeshComponent::StaticClass(), name);
 	meshes.Add(wall_mesh);
 
 	TCHAR const * mesh_name = nullptr;
@@ -48,10 +48,12 @@ void ARoom::LoadWall(FVector loc, FRotator rotation, FName name, WALL_TYPE const
 			mesh_name = TEXT("StaticMesh'/Game/Models/wall_door.wall_door'");
 	}
 
-	ConstructorHelpers::FObjectFinder<UStaticMesh> mesh_asset(mesh_name);
+	//ConstructorHelpers::FObjectFinder<UStaticMesh> mesh_asset(mesh_name);
+	UStaticMesh* mesh_asset = (UStaticMesh*) StaticLoadObject(UStaticMesh::StaticClass(), nullptr, mesh_name);
 
-	if (mesh_asset.Succeeded()) {
-		wall_mesh->SetStaticMesh(mesh_asset.Object);
+
+	if (mesh_asset) {
+		wall_mesh->SetStaticMesh(mesh_asset);
 	}
 	else {
 		UE_LOG(LogTemp, Warning, TEXT("failed to create mesh asset"));
@@ -70,13 +72,13 @@ void ARoom::LoadWall(FVector loc, FRotator rotation, FName name, WALL_TYPE const
 
 void ARoom::LoadCeiling()
 {
-	auto ceiling_mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ceiling"));
+	auto ceiling_mesh = NewObject<UStaticMeshComponent>(this, UStaticMeshComponent::StaticClass(), TEXT("ceiling"));
 	meshes.Add(ceiling_mesh);
 
-	ConstructorHelpers::FObjectFinder<UStaticMesh> mesh_asset(TEXT("StaticMesh'/Game/Models/ceiling.ceiling'"));
+	UStaticMesh* mesh_asset = (UStaticMesh*) StaticLoadObject(UStaticMesh::StaticClass(), nullptr, TEXT("StaticMesh'/Game/Models/ceiling.ceiling'"));
 
-	if (mesh_asset.Succeeded()) {
-		ceiling_mesh->SetStaticMesh(mesh_asset.Object);
+	if (mesh_asset) {
+		ceiling_mesh->SetStaticMesh(mesh_asset);
 	}
 	else {
 		UE_LOG(LogTemp, Warning, TEXT("failed to create mesh asset"));
@@ -95,7 +97,7 @@ void ARoom::LoadCeiling()
 
 void ARoom::LoadLight()
 {
-	auto light = CreateDefaultSubobject<UPointLightComponent>(TEXT("room light"));
+	auto light = NewObject<UPointLightComponent>(this, UPointLightComponent::StaticClass(), TEXT("room light"));
 	meshes.Add(light);
 
 	if (RootComponent) {
