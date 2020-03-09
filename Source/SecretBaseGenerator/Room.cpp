@@ -59,8 +59,10 @@ void ARoom::LoadWall(FVector loc, FRotator rotation, FName name, WALL_TYPE const
 		UE_LOG(LogTemp, Warning, TEXT("failed to create mesh asset"));
 	}
 
+	wall_mesh->RegisterComponent();
+
 	if (RootComponent) {
-		wall_mesh->SetupAttachment(RootComponent);
+		wall_mesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	}
 	else {
 		UE_LOG(LogTemp, Warning, TEXT("Not attaching wall"));
@@ -84,8 +86,10 @@ void ARoom::LoadCeiling()
 		UE_LOG(LogTemp, Warning, TEXT("failed to create mesh asset"));
 	}
 
+	ceiling_mesh->RegisterComponent();
+
 	if (RootComponent) {
-		ceiling_mesh->SetupAttachment(RootComponent);
+		ceiling_mesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	}
 	else {
 		UE_LOG(LogTemp, Warning, TEXT("Not attaching wall"));
@@ -100,8 +104,10 @@ void ARoom::LoadLight()
 	auto light = NewObject<UPointLightComponent>(this, UPointLightComponent::StaticClass(), TEXT("room light"));
 	meshes.Add(light);
 
+	light->RegisterComponent();
+
 	if (RootComponent) {
-		light->SetupAttachment(RootComponent);
+		light->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	}
 
 	light->SetRelativeLocation(FVector(0.0f, 0.0f, 235.0f), false);
