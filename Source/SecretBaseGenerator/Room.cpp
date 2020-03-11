@@ -45,6 +45,7 @@ void ARoom::LoadWall(FVector loc, FRotator rotation, FName name, WALL_TYPE const
 			mesh_name = TEXT("StaticMesh'/Game/Models/wall_door.wall_door'");
 			break;
 		default:
+			UE_LOG(LogTemp, Warning, TEXT("unknown wall type"));
 			mesh_name = TEXT("StaticMesh'/Game/Models/wall_door.wall_door'");
 	}
 
@@ -115,10 +116,10 @@ void ARoom::LoadLight()
 
 void ARoom::Initialize(RoomBlock const& block)
 {
-	LoadWall(FVector(495.0f, 0.0f, 137.5f), FRotator(0.0f, 180.0f, 0.0f), "front wall", block.walls[0]);
-	LoadWall(FVector(0.0f, 495.0f, 137.5f), FRotator(0.0f, -90.0f, 0.0f), "right wall", block.walls[1]);
-	LoadWall(FVector(-495.0f, 0.0f, 137.5f), FRotator(0.0f, 0.0f, 0.0f), "back wall", block.walls[2]);
-	LoadWall(FVector(0.0f, -495.0f, 137.5f), FRotator(0.0f, 90.0f, 0.0f), "left wall", block.walls[3]);
+	LoadWall(FVector(495.0f, 0.0f, 137.5f), FRotator(0.0f, 180.0f, 0.0f), "right wall", block.walls[1]);
+	LoadWall(FVector(0.0f, 495.0f, 137.5f), FRotator(0.0f, -90.0f, 0.0f), "front wall", block.walls[0]);
+	LoadWall(FVector(-495.0f, 0.0f, 137.5f), FRotator(0.0f, 0.0f, 0.0f), "left wall", block.walls[3]);
+	LoadWall(FVector(0.0f, -495.0f, 137.5f), FRotator(0.0f, 90.0f, 0.0f), "back wall", block.walls[2]);
 
 	LoadCeiling();
 	LoadLight();

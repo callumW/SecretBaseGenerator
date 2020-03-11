@@ -39,7 +39,7 @@ public:
 
 private:
 
-	ESet<RoomBlock, RoomBlockSetLessThan>  GetRoomLocations();
+	ESet<RoomBlock>  GetRoomLocations();
 
 	TArray<ARoom*> rooms;
 };

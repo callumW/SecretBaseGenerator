@@ -32,14 +32,6 @@ typedef struct RoomBlock
 
 } RoomBlock;
 
-struct RoomBlockSetLessThan
-{
-	bool operator()(RoomBlock const& left, RoomBlock const& right) const
-	{
-		return (left.x < right.x || left.y < right.y);
-	}
-};
-
 
 UCLASS()
 class SECRETBASEGENERATOR_API ARoom : public AActor

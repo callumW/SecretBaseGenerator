@@ -23,22 +23,39 @@ void ARoomSpawner::BeginPlay()
 	float const xOffset = 1000.0f;
 	float const yOffset = 1000.0f;
 
-	auto room_locations = GetRoomLocations();
+	try {
+		auto room_locations = GetRoomLocations();
 
-	for (auto & loc : room_locations) {
-		FVector location(loc.x * xOffset, loc.y * yOffset, height);
-		ARoom* tmp = (ARoom*) GetWorld()->SpawnActor(ARoom::StaticClass());
-		tmp->Initialize(loc);
-		tmp->SetActorLocation(location);
-		rooms.Add(tmp);
+		for (auto & loc : room_locations) {
+			FVector location(loc.x * xOffset, loc.y * yOffset, height);
+			ARoom* tmp = (ARoom*) GetWorld()->SpawnActor(ARoom::StaticClass());
+			tmp->Initialize(loc);
+			tmp->SetActorLocation(location);
+			rooms.Add(tmp);
+		}
+	}
+	catch(std::exception const& e) {
+		UE_LOG(LogTemp, Warning, TEXT("Caught exception: %s"), e.what());
 	}
 }
 
-ESet<RoomBlock, RoomBlockSetLessThan>  ARoomSpawner::GetRoomLocations()
+ESet<RoomBlock>  ARoomSpawner::GetRoomLocations()
 {
-	ESet<RoomBlock, RoomBlockSetLessThan> room_set;
-	ESet<RoomBlock, RoomBlockSetLessThan> adjacent_room_set{(unsigned) seed};
+	ESet<RoomBlock> room_set;
+	ESet<RoomBlock> adjacent_room_set{(unsigned) seed};
 	room_set.insert(RoomBlock(0.0f, 0.0f));	// add origin so player doesn't fall!
+
+	// {
+	// 	RoomBlock tmp{0.0f, 0.0f};
+	// 	UE_LOG(LogTemp, Warning, TEXT("Origin front wall type %d"), (int) tmp.walls[0]);
+	//
+	// 	if (room_set.contains(tmp)) {
+	// 		UE_LOG(LogTemp, Warning, TEXT("roomt contains origin!"));
+	// 	}
+	// 	else {
+	// 		UE_LOG(LogTemp, Warning, TEXT("Room does not contain origin"));
+	// 	}
+	// }
 
 	adjacent_room_set.insert(RoomBlock(1.0f, 0.0f));
 	adjacent_room_set.insert(RoomBlock(0.0f, 1.0f));
@@ -67,8 +84,31 @@ ESet<RoomBlock, RoomBlockSetLessThan>  ARoomSpawner::GetRoomLocations()
 		}
 
 		room_set.insert(current_room);
-		UE_LOG(LogTemp, Warning, TEXT("Added room: %f, %f to create mesh asset"), current_room.x, current_room.y);
+		// UE_LOG(LogTemp, Warning, TEXT("Added room: %f, %f to create mesh asset"), current_room.x, current_room.y);
 		count++;
+	}
+
+	// ESet<RoomBlock, RoomBlockSetLessThan> return_set;
+	// Setup open walls
+	for (auto & room : room_set) {
+		RoomBlock bottom{room.x, room.y-1};
+		RoomBlock left{room.x-1, room.y};
+		RoomBlock right{room.x+1, room.y};
+		RoomBlock top{room.x, room.y+1};
+
+
+		if (room_set.contains(bottom)) {
+			room.walls[2] = WALL_TYPE::DOOR;
+		}
+		if (room_set.contains(left)) {
+			room.walls[3] = WALL_TYPE::DOOR;
+		}
+		if (room_set.contains(right)) {
+			room.walls[1] = WALL_TYPE::DOOR;
+		}
+		if (room_set.contains(top)) {
+			room.walls[0] = WALL_TYPE::DOOR;
+		}
 	}
 
 	return room_set;

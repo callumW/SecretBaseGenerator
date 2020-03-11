@@ -12,7 +12,8 @@
 /**
  * Extensiond of std::set that provides access to a random element
  */
-template <class T, class Compare = std::less<T>>
+template <class T>
+
 class SECRETBASEGENERATOR_API ESet
 {
 public:
@@ -21,26 +22,52 @@ public:
 
 	void set_seed(unsigned seed);
 
-	bool insert(T const& obj) { return m_set.insert(obj).second; }
-	void erase(T const& obj) { m_set.erase(obj); }
+	bool insert(T const& obj)
+	{
+		if (!contains(obj)) {
+			m_vec.push_back(obj);
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	void erase(T const& obj)
+	{
+		for (auto it = m_vec.begin(); it != m_vec.end(); it++) {
+			if (obj == *it) {
+				m_vec.erase(it);
+				return;
+			}
+		}
+	}
 
-	auto begin() { return m_set.begin(); }
-	auto end() { return m_set.end(); }
+	void replace(T const& obj)
+	{
+		erase(obj);
+		insert(obj);
+	}
 
-	bool contains(T const& obj) { return m_set.end() != m_set.find(obj); }
+	typename std::vector<T>::iterator begin() { return m_vec.begin(); }
+	typename std::vector<T>::iterator end() { return m_vec.end(); }
+
+	bool contains(T const& obj)
+	{
+		for (auto it = m_vec.begin(); it != m_vec.end(); it++) {
+			if (obj == *it) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	T get_random()
 	{
-		if (!m_set.empty()) {
-			std::uniform_int_distribution<> dist(0, m_set.size() - 1);
+		if (!m_vec.empty()) {
+			std::uniform_int_distribution<> dist(0, m_vec.size() - 1);
 			int index = dist(m_rand_engine);
 
-			auto it = m_set.begin();
-			while (index-- > 0) {
-				it++;
-			}
-
-			return *it;
+			return m_vec[index];
 		}
 		else {
 			throw std::out_of_range("cannot get random value from empty ESet");
@@ -48,7 +75,7 @@ public:
 	}
 
 protected:
-	std::set<T, Compare> m_set;
+	std::vector<T> m_vec;
 	unsigned m_seed;
 
 	std::mt19937 m_rand_engine;
