@@ -26,8 +26,6 @@ ARoom::ARoom()
 			UE_LOG(LogTemp, Warning, TEXT("failed to create mesh asset"));
 		}
 	}
-
-	// Initialize(RoomBlock(0.0f, 0.0f));
 }
 
 void ARoom::LoadWall(FVector loc, FRotator rotation, FName name, WALL_TYPE const type)
@@ -49,7 +47,6 @@ void ARoom::LoadWall(FVector loc, FRotator rotation, FName name, WALL_TYPE const
 			mesh_name = TEXT("StaticMesh'/Game/Models/wall_door.wall_door'");
 	}
 
-	//ConstructorHelpers::FObjectFinder<UStaticMesh> mesh_asset(mesh_name);
 	UStaticMesh* mesh_asset = (UStaticMesh*) StaticLoadObject(UStaticMesh::StaticClass(), nullptr, mesh_name);
 
 

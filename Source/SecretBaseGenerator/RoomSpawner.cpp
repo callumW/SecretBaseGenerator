@@ -45,18 +45,6 @@ ESet<RoomBlock>  ARoomSpawner::GetRoomLocations()
 	ESet<RoomBlock> adjacent_room_set{(unsigned) seed};
 	room_set.insert(RoomBlock(0.0f, 0.0f));	// add origin so player doesn't fall!
 
-	// {
-	// 	RoomBlock tmp{0.0f, 0.0f};
-	// 	UE_LOG(LogTemp, Warning, TEXT("Origin front wall type %d"), (int) tmp.walls[0]);
-	//
-	// 	if (room_set.contains(tmp)) {
-	// 		UE_LOG(LogTemp, Warning, TEXT("roomt contains origin!"));
-	// 	}
-	// 	else {
-	// 		UE_LOG(LogTemp, Warning, TEXT("Room does not contain origin"));
-	// 	}
-	// }
-
 	adjacent_room_set.insert(RoomBlock(1.0f, 0.0f));
 	adjacent_room_set.insert(RoomBlock(0.0f, 1.0f));
 
@@ -84,11 +72,9 @@ ESet<RoomBlock>  ARoomSpawner::GetRoomLocations()
 		}
 
 		room_set.insert(current_room);
-		// UE_LOG(LogTemp, Warning, TEXT("Added room: %f, %f to create mesh asset"), current_room.x, current_room.y);
 		count++;
 	}
 
-	// ESet<RoomBlock, RoomBlockSetLessThan> return_set;
 	// Setup open walls
 	for (auto & room : room_set) {
 		RoomBlock bottom{room.x, room.y-1};
