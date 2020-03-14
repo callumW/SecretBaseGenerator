@@ -130,62 +130,58 @@ void LevelGenerator::place_rooms(ESet<Node>& node_set)
         int min_y = seed_nodes[0].y - current_radius;
         int max_y = seed_nodes[0].y + current_radius;
 
+        ESet<Node> new_nodes;
+
         for (int x = min_x; x <= max_x; x++) {
             Node one(x, min_y);
             Node two(x, max_y);
 
-            if (node_set.contains(one)) {   // in gobal set
-                auto adjacents = get_adjacents(one);
-                for (auto & n : adjacents) {
-                    if (seed_nodes.contains(n)) {   // is adjacent to node in room
-                        seed_nodes.insert(one);
-                        node_set.erase(one);
-                        break;
-                    }
-                }
-            }
-
-            if (node_set.contains(two)) {   // in gobal set
-                auto adjacents = get_adjacents(two);
-                for (auto & n : adjacents) {
-                    if (seed_nodes.contains(n)) {   // is adjacent to node in room
-                        seed_nodes.insert(two);
-                        node_set.erase(two);
-                        break;
-                    }
-                }
-            }
+            new_nodes.insert(one);
+            new_nodes.insert(two);
         }
 
         for (int y = min_y; y <= max_y; y++) {
             Node one(min_x, y);
             Node two(max_x, y);
 
-            if (node_set.contains(one)) {   // in gobal set
-                auto adjacents = get_adjacents(one);
-                for (auto & n : adjacents) {
-                    if (seed_nodes.contains(n)) {   // is adjacent to node in room
-                        seed_nodes.insert(one);
-                        node_set.erase(one);
-                        break;
-                    }
-                }
-            }
+            new_nodes.insert(one);
+            new_nodes.insert(two);
+        }
 
-            if (node_set.contains(two)) {   // in gobal set
-                auto adjacents = get_adjacents(two);
-                for (auto & n : adjacents) {
-                    if (seed_nodes.contains(n)) {   // is adjacent to node in room
-                        seed_nodes.insert(two);
-                        node_set.erase(two);
-                        break;
+        int last_node_count = 0;
+        while (!new_nodes.empty() && new_nodes.size() != last_node_count) {
+            last_node_count = new_nodes.size();
+
+            for (auto it = new_nodes.begin(); it != new_nodes.end();) {
+                bool increment = true;
+                if (node_set.contains(*it)) {
+                    auto adjacents = get_adjacents(*it);
+
+                    for (auto & n : adjacents) {
+                        if (seed_nodes.contains(n)) {
+                            seed_nodes.insert(*it);
+                            node_set.erase(*it);
+                            it = new_nodes.erase(it);
+                            increment = false;
+                            break;
+                        }
                     }
                 }
+                if (increment) it++;
             }
         }
     }
 
     UE_LOG(LogTemp, Warning, TEXT("Total room count: %u"), node_set.size());
+
+
+    /** Temporarily re-add rooms **/
+    for (auto & seed_obj : seed_rooms) {
+        auto & seed_set = seed_obj.first;
+        for (auto & node : seed_set) {
+            node_set.insert(node);
+        }
+    }
 }
 
 }
