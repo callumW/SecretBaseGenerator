@@ -74,6 +74,10 @@ public:
 		}
 	}
 
+	std::vector<T> to_vector() const { return m_vec; }
+
+	std::vector<T>& vec() { return m_vec; }
+
 protected:
 	std::vector<T> m_vec;
 	unsigned m_seed;

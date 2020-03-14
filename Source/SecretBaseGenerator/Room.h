@@ -2,6 +2,9 @@
 
 #pragma once
 
+
+#include "LevelGenerator.h"
+
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Room.generated.h"
@@ -42,7 +45,7 @@ public:
 	// Sets default values for this actor's properties
 	ARoom();
 
-	void Initialize(RoomBlock const& block);
+	void Initialize(LevelGeneration::Node const& block);
 
 protected:
 	// Called when the game starts or when spawned
@@ -53,7 +56,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
-	void LoadWall(FVector loc, FRotator rotation, FName name, WALL_TYPE const type);
+	void LoadWall(FVector loc, FRotator rotation, FName name, LevelGeneration::NODE_TYPE const type);
 	void LoadCeiling();
 	void LoadLight();
 

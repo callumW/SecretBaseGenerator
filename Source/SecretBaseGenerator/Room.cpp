@@ -28,7 +28,7 @@ ARoom::ARoom()
 	}
 }
 
-void ARoom::LoadWall(FVector loc, FRotator rotation, FName name, WALL_TYPE const type)
+void ARoom::LoadWall(FVector loc, FRotator rotation, FName name, LevelGeneration::NODE_TYPE const type)
 {
 	auto wall_mesh = NewObject<UStaticMeshComponent>(this, UStaticMeshComponent::StaticClass(), name);
 	meshes.Add(wall_mesh);
@@ -36,10 +36,10 @@ void ARoom::LoadWall(FVector loc, FRotator rotation, FName name, WALL_TYPE const
 	TCHAR const * mesh_name = nullptr;
 
 	switch(type) {
-		case WALL_TYPE::WALL:
+		case LevelGeneration::NODE_TYPE::WALL:
 			mesh_name = TEXT("StaticMesh'/Game/Models/wall.wall'");
 			break;
-		case WALL_TYPE::DOOR:
+		case LevelGeneration::NODE_TYPE::DOOR:
 			mesh_name = TEXT("StaticMesh'/Game/Models/wall_door.wall_door'");
 			break;
 		default:
@@ -111,7 +111,7 @@ void ARoom::LoadLight()
 	light->SetRelativeLocation(FVector(0.0f, 0.0f, 235.0f), false);
 }
 
-void ARoom::Initialize(RoomBlock const& block)
+void ARoom::Initialize(LevelGeneration::Node const& block)
 {
 	LoadWall(FVector(495.0f, 0.0f, 137.5f), FRotator(0.0f, 180.0f, 0.0f), "right wall", block.walls[1]);
 	LoadWall(FVector(0.0f, 495.0f, 137.5f), FRotator(0.0f, -90.0f, 0.0f), "front wall", block.walls[0]);

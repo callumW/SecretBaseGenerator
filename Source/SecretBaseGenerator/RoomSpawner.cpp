@@ -3,6 +3,8 @@
 
 #include "RoomSpawner.h"
 
+#include "LevelGenerator.h"
+
 // Sets default values
 ARoomSpawner::ARoomSpawner()
 {
@@ -24,7 +26,9 @@ void ARoomSpawner::BeginPlay()
 	float const yOffset = 1000.0f;
 
 	try {
-		auto room_locations = GetRoomLocations();
+		LevelGeneration::LevelGenerator genie;
+
+		auto room_locations = genie.GenerateLevel();
 
 		for (auto & loc : room_locations) {
 			FVector location(loc.x * xOffset, loc.y * yOffset, height);
