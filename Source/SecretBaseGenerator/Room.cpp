@@ -30,9 +30,6 @@ ARoom::ARoom()
 
 void ARoom::LoadWall(FVector loc, FRotator rotation, FName name, LevelGeneration::NODE_TYPE const type)
 {
-	auto wall_mesh = NewObject<UStaticMeshComponent>(this, UStaticMeshComponent::StaticClass(), name);
-	meshes.Add(wall_mesh);
-
 	TCHAR const * mesh_name = nullptr;
 
 	switch(type) {
@@ -42,10 +39,15 @@ void ARoom::LoadWall(FVector loc, FRotator rotation, FName name, LevelGeneration
 		case LevelGeneration::NODE_TYPE::DOOR:
 			mesh_name = TEXT("StaticMesh'/Game/Models/wall_door.wall_door'");
 			break;
+		case LevelGeneration::NODE_TYPE::NONE:	// no wall needed
+			return;
 		default:
 			UE_LOG(LogTemp, Warning, TEXT("unknown wall type"));
 			mesh_name = TEXT("StaticMesh'/Game/Models/wall_door.wall_door'");
 	}
+
+	auto wall_mesh = NewObject<UStaticMeshComponent>(this, UStaticMeshComponent::StaticClass(), name);
+	meshes.Add(wall_mesh);
 
 	UStaticMesh* mesh_asset = (UStaticMesh*) StaticLoadObject(UStaticMesh::StaticClass(), nullptr, mesh_name);
 
@@ -113,10 +115,10 @@ void ARoom::LoadLight()
 
 void ARoom::Initialize(LevelGeneration::Node const& block)
 {
-	LoadWall(FVector(495.0f, 0.0f, 137.5f), FRotator(0.0f, 180.0f, 0.0f), "right wall", block.walls[1]);
-	LoadWall(FVector(0.0f, 495.0f, 137.5f), FRotator(0.0f, -90.0f, 0.0f), "front wall", block.walls[0]);
-	LoadWall(FVector(-495.0f, 0.0f, 137.5f), FRotator(0.0f, 0.0f, 0.0f), "left wall", block.walls[3]);
-	LoadWall(FVector(0.0f, -495.0f, 137.5f), FRotator(0.0f, 90.0f, 0.0f), "back wall", block.walls[2]);
+	LoadWall(FVector(495.0f, 0.0, 137.5f), FRotator(0.0f, 180.0f, 0.0f), "front wall", block.walls[0]);
+	LoadWall(FVector(0.0f, 495.0f, 137.5f), FRotator(0.0f, -90.0f, 0.0f), "right wall", block.walls[1]);
+	LoadWall(FVector(-495.0f, 0.0f, 137.5f), FRotator(0.0f, 0.0f, 0.0f), "back wall", block.walls[2]);
+	LoadWall(FVector(0.0f, -495.0f, 137.5f), FRotator(0.0f, 90.0f, 0.0f), "left wall", block.walls[3]);
 
 	LoadCeiling();
 	LoadLight();

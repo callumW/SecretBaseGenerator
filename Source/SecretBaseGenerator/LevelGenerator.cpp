@@ -46,10 +46,10 @@ void LevelGenerator::spawn_node_set(ESet<Node>& node_set)
 
         // calculate adjacent rooms
         std::vector<Node> adjacents = {
-            {current_room.x, current_room.y-1},
-            {current_room.x-1, current_room.y},
-            {current_room.x+1, current_room.y},
-            {current_room.x, current_room.y+1},
+            {current_room.x, current_room.y-1}, //N
+            {current_room.x+1, current_room.y}, //E
+            {current_room.x, current_room.y+1}, //S
+            {current_room.x-1, current_room.y}, //W
         };
 
         // add to adjacent room list
@@ -65,7 +65,7 @@ void LevelGenerator::spawn_node_set(ESet<Node>& node_set)
 
 std::vector<Node> LevelGenerator::get_adjacents(Node n)
 {
-    return {Node(n.x-1, n.y), Node(n.x+1, n.y), Node(n.x, n.y-1), Node(n.x, n.y+1)};
+    return {Node(n.x+1, n.y), Node(n.x, n.y+1), Node(n.x-1, n.y), Node(n.x, n.y-1)};
 }
 
 void LevelGenerator::place_rooms(ESet<Node>& node_set)
@@ -175,10 +175,24 @@ void LevelGenerator::place_rooms(ESet<Node>& node_set)
     UE_LOG(LogTemp, Warning, TEXT("Total room count: %u"), node_set.size());
 
 
-    /** Temporarily re-add rooms **/
     for (auto & seed_obj : seed_rooms) {
         auto & seed_set = seed_obj.first;
         for (auto & node : seed_set) {
+            auto adjacents = get_adjacents(node);
+
+            if (!seed_set.contains(adjacents[0])) {
+                node.walls[0] = NODE_TYPE::WALL;
+            }
+            if (!seed_set.contains(adjacents[1])) {
+                node.walls[1] = NODE_TYPE::WALL;
+            }
+            if (!seed_set.contains(adjacents[2])) {
+                node.walls[2] = NODE_TYPE::WALL;
+            }
+            if (!seed_set.contains(adjacents[3])) {
+                node.walls[3] = NODE_TYPE::WALL;
+            }
+
             node_set.insert(node);
         }
     }

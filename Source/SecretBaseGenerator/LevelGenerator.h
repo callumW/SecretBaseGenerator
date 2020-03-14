@@ -18,7 +18,7 @@ enum class NODE_TYPE {
 
 typedef struct Node {
 	int x, y;
-	// N (-y), E (+x), S(+y), W (-x)
+	// N (+x), E (+y), S(-x), W (-y)
 	NODE_TYPE walls[4] = {NODE_TYPE::NONE};
 
 	Node(int x_val, int y_val)

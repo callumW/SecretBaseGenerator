@@ -30,6 +30,9 @@ void ARoomSpawner::BeginPlay()
 
 		auto room_locations = genie.GenerateLevel();
 
+		// std::vector<LevelGeneration::Node> room_locations = {LevelGeneration::Node(0, 0)};
+		// room_locations[0].walls[0] = LevelGeneration::NODE_TYPE::WALL;
+
 		for (auto & loc : room_locations) {
 			FVector location(loc.x * xOffset, loc.y * yOffset, height);
 			ARoom* tmp = (ARoom*) GetWorld()->SpawnActor(ARoom::StaticClass());
