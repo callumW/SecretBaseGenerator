@@ -18,7 +18,18 @@ class SECRETBASEGENERATOR_API ESet
 {
 public:
 
-	ESet(unsigned seed = 0):m_seed(seed) { m_rand_engine.seed(m_seed); }
+	ESet(unsigned seed = 0)
+		:m_seed(seed)
+	{
+		m_rand_engine.seed(m_seed);
+	}
+
+	ESet(size_t count, T const& obj, unsigned seed = 0)
+		:m_vec(count, obj),
+		m_seed(seed)
+	{
+		m_rand_engine.seed(m_seed);
+	}
 
 	void set_seed(unsigned seed);
 
@@ -51,7 +62,7 @@ public:
 	typename std::vector<T>::iterator begin() { return m_vec.begin(); }
 	typename std::vector<T>::iterator end() { return m_vec.end(); }
 
-	bool contains(T const& obj)
+	bool contains(T const& obj) const
 	{
 		for (auto it = m_vec.begin(); it != m_vec.end(); it++) {
 			if (obj == *it) {
@@ -61,11 +72,17 @@ public:
 		return false;
 	}
 
-	T get_random()
+	T& get_random()
 	{
-		if (!m_vec.empty()) {
+		if (!empty()) {
+			if (size() == 1) {
+				return m_vec[0];
+			}
+
 			std::uniform_int_distribution<> dist(0, m_vec.size() - 1);
 			int index = dist(m_rand_engine);
+
+			UE_LOG(LogTemp, Warning, TEXT("returning index: %d"), index);
 
 			return m_vec[index];
 		}
@@ -73,6 +90,26 @@ public:
 			throw std::out_of_range("cannot get random value from empty ESet");
 		}
 	}
+
+	T& operator[](size_t i)
+	{
+		if (i < m_vec.size())
+			return m_vec[i];
+		else {
+			throw std::out_of_range("ESet: invalid index access");
+		}
+	}
+
+	bool empty() const
+	{
+		return m_vec.empty();
+	}
+
+	size_t size() const
+	{
+		return m_vec.size();
+	}
+
 
 	std::vector<T> to_vector() const { return m_vec; }
 

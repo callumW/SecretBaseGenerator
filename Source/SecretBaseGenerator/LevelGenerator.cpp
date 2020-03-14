@@ -16,24 +16,25 @@ LevelGenerator::~LevelGenerator()
 
 std::vector<Node> LevelGenerator::GenerateLevel()
 {
-    std::vector<Node> rooms;
+    ESet<Node> rooms((unsigned) 353424);
 
     spawn_node_set(rooms);
 
     place_rooms(rooms);
 
-    return rooms;
+    return rooms.to_vector();
 }
 
-void LevelGenerator::spawn_node_set(std::vector<Node>& node_set)
+void LevelGenerator::spawn_node_set(ESet<Node>& node_set)
 {
     const int num_rooms = 60;
-    ESet<Node> room_set;
     ESet<Node> adjacent_room_set{};
-    room_set.insert(Node(0, 0));	// add origin so player doesn't fall!
+    node_set.insert(Node(0, 0));	// add origin so player doesn't fall!
 
     adjacent_room_set.insert(Node(1, 0));
     adjacent_room_set.insert(Node(0, 1));
+    adjacent_room_set.insert(Node(-1, 0));
+    adjacent_room_set.insert(Node(0, -1));
 
     uint8 count = 1;
     while (count <= num_rooms) {
@@ -41,7 +42,7 @@ void LevelGenerator::spawn_node_set(std::vector<Node>& node_set)
         auto current_room = adjacent_room_set.get_random();
         adjacent_room_set.erase(current_room);
 
-        room_set.insert(current_room);
+        node_set.insert(current_room);
 
         // calculate adjacent rooms
         std::vector<Node> adjacents = {
@@ -53,21 +54,138 @@ void LevelGenerator::spawn_node_set(std::vector<Node>& node_set)
 
         // add to adjacent room list
         for (auto & r : adjacents) {
-            if (!room_set.contains(r)) {
+            if (!node_set.contains(r)) {
                 adjacent_room_set.insert(r);
             }
         }
 
-        room_set.insert(current_room);
         count++;
     }
-
-    node_set.swap(room_set.vec());
 }
 
-void LevelGenerator::place_rooms(std::vector<Node>& node_set)
+std::vector<Node> LevelGenerator::get_adjacents(Node n)
+{
+    return {Node(n.x-1, n.y), Node(n.x+1, n.y), Node(n.x, n.y-1), Node(n.x, n.y+1)};
+}
+
+void LevelGenerator::place_rooms(ESet<Node>& node_set)
 {
 
+    const unsigned target_num_rooms = 5;
+
+    ESet<std::pair<ESet<Node>, int>> seed_rooms(target_num_rooms,
+                                                std::make_pair<ESet<Node>, int>({},0));
+
+    unsigned count = 0;
+    while (count < target_num_rooms) {
+        auto node = node_set.get_random();
+        auto & seed_set = seed_rooms[count].first;
+
+        if (seed_set.insert(node)) {
+            node_set.erase(node);
+            count++;
+        }
+    }
+
+    UE_LOG(LogTemp, Warning, TEXT("Seeds: "));
+    for (auto & seed_obj : seed_rooms) {
+        UE_LOG(LogTemp, Warning, TEXT("     (%d,%d)"), seed_obj.first[0].x, seed_obj.first[0].y);
+    }
+
+    /** Distribute nodes between seeds to form rooms **/
+    UE_LOG(LogTemp, Warning, TEXT("Entering seed growth stage"));
+    while (!node_set.empty()) {
+        // Get a random seed
+        UE_LOG(LogTemp, Warning, TEXT("node_set size: %d"), node_set.size());
+        for (auto const& node : node_set) {
+            bool is_linked = false;
+            auto adj = get_adjacents(node);
+            for (auto const& seed_obj : seed_rooms) {
+                for (auto n : adj) {
+                    if (seed_obj.first.contains(n)) {
+                        is_linked = true;
+                    }
+                }
+            }
+
+            if (!is_linked) {
+                UE_LOG(LogTemp, Warning, TEXT("Room (%d,%d) is not linked to any seed!"),
+                    node.x,
+                    node.y
+                );
+            }
+        }
+
+        auto & seed = seed_rooms.get_random();
+        int current_radius = seed.second + 1;
+        UE_LOG(LogTemp, Warning, TEXT("Radius: %d"), current_radius);
+        seed.second = current_radius;
+        auto & seed_nodes = seed.first;
+
+
+        /** Get nodes **/
+        int min_x = seed_nodes[0].x - current_radius;
+        int max_x = seed_nodes[0].x + current_radius;
+
+        int min_y = seed_nodes[0].y - current_radius;
+        int max_y = seed_nodes[0].y + current_radius;
+
+        for (int x = min_x; x <= max_x; x++) {
+            Node one(x, min_y);
+            Node two(x, max_y);
+
+            if (node_set.contains(one)) {   // in gobal set
+                auto adjacents = get_adjacents(one);
+                for (auto & n : adjacents) {
+                    if (seed_nodes.contains(n)) {   // is adjacent to node in room
+                        seed_nodes.insert(one);
+                        node_set.erase(one);
+                        break;
+                    }
+                }
+            }
+
+            if (node_set.contains(two)) {   // in gobal set
+                auto adjacents = get_adjacents(two);
+                for (auto & n : adjacents) {
+                    if (seed_nodes.contains(n)) {   // is adjacent to node in room
+                        seed_nodes.insert(two);
+                        node_set.erase(two);
+                        break;
+                    }
+                }
+            }
+        }
+
+        for (int y = min_y; y <= max_y; y++) {
+            Node one(min_x, y);
+            Node two(max_x, y);
+
+            if (node_set.contains(one)) {   // in gobal set
+                auto adjacents = get_adjacents(one);
+                for (auto & n : adjacents) {
+                    if (seed_nodes.contains(n)) {   // is adjacent to node in room
+                        seed_nodes.insert(one);
+                        node_set.erase(one);
+                        break;
+                    }
+                }
+            }
+
+            if (node_set.contains(two)) {   // in gobal set
+                auto adjacents = get_adjacents(two);
+                for (auto & n : adjacents) {
+                    if (seed_nodes.contains(n)) {   // is adjacent to node in room
+                        seed_nodes.insert(two);
+                        node_set.erase(two);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    UE_LOG(LogTemp, Warning, TEXT("Total room count: %u"), node_set.size());
 }
 
 }

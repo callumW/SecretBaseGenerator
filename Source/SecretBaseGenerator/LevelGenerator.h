@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 
+#include "ESet.h"
 #include <vector>
 
 namespace LevelGeneration {
@@ -45,8 +46,10 @@ public:
 	std::vector<Node> GenerateLevel();
 
 private:
-	void spawn_node_set(std::vector<Node>& node_set);
-	void place_rooms(std::vector<Node>& node_set);
+	void spawn_node_set(ESet<Node>& node_set);
+	void place_rooms(ESet<Node>& node_set);
+
+	static std::vector<Node> get_adjacents(Node n);
 };
 
 }
