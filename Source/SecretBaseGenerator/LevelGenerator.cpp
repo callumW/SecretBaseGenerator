@@ -174,7 +174,7 @@ void LevelGenerator::place_rooms(ESet<Node>& node_set)
 
     UE_LOG(LogTemp, Warning, TEXT("Total room count: %u"), node_set.size());
 
-
+    /** Place walls along perimeter of rooms **/
     for (auto & seed_obj : seed_rooms) {
         auto & seed_set = seed_obj.first;
         for (auto & node : seed_set) {
@@ -195,6 +195,69 @@ void LevelGenerator::place_rooms(ESet<Node>& node_set)
 
             node_set.insert(node);
         }
+    }
+
+    UE_LOG(LogTemp, Warning, TEXT("Calculating doors"));
+
+    ESet<Door> all_doors;
+
+    for (int i = 0; i < seed_rooms.size(); i++) {
+        for (int j = 0; j < seed_rooms.size(); j++) {
+            ESet<Node> a_boundary_nodes;
+            ESet<Node> b_boundary_nodes;
+
+            if (i == j) {
+                continue;
+            }
+            else {
+                for (auto & node : seed_rooms[i].first) {
+                    auto adjacents = get_adjacents(node);
+                    for (auto & neighbor : adjacents) {
+                        if (seed_rooms[j].first.contains(neighbor)) {
+                            a_boundary_nodes.insert(node);
+                            b_boundary_nodes.insert(neighbor);
+                        }
+                    }
+                }
+            }
+
+            if (!a_boundary_nodes.empty()) {
+                size_t node_index = 0;
+                auto node_a = a_boundary_nodes.get_random(node_index);
+                auto node_b = b_boundary_nodes[node_index];
+
+                if (node_a.x < node_b.x) {  // door to north
+                    node_a.walls[0] = NODE_TYPE::DOOR;
+                    node_b.walls[2] = NODE_TYPE::DOOR;
+                }
+                else if (node_a.x > node_b.x) {
+                    node_a.walls[2] = NODE_TYPE::DOOR;
+                    node_b.walls[0] = NODE_TYPE::DOOR;
+                }
+                else if (node_a.y < node_b.y) {
+                    node_a.walls[1] = NODE_TYPE::DOOR;
+                    node_b.walls[3] = NODE_TYPE::DOOR;
+                }
+                else if (node_a.y > node_b.y) {
+                    node_a.walls[3] = NODE_TYPE::DOOR;
+                    node_b.walls[1] = NODE_TYPE::DOOR;
+                }
+
+                Door door = {
+                    node_a,
+                    node_b,
+                    i,
+                    j
+                };
+
+                all_doors.insert(door);
+            }
+        }
+    }
+
+    for (auto & door : all_doors) {
+        node_set.replace(door.a);
+        node_set.replace(door.b);
     }
 }
 

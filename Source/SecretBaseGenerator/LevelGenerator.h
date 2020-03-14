@@ -6,6 +6,7 @@
 
 #include "ESet.h"
 #include <vector>
+#include <cstring>
 
 namespace LevelGeneration {
 
@@ -31,7 +32,30 @@ typedef struct Node {
 	{
 		return other.x == x && other.y == y;
 	}
+
+	Node(Node const& other)
+	{
+		x = other.x;
+		y = other.y;
+		std::memcpy((void*) walls, (void const*) other.walls, sizeof(NODE_TYPE) * 4);
+	}
 } Node;
+
+typedef struct Door {
+	Node a;
+	Node b;
+
+	int set_a;
+	int set_b;
+
+	bool operator==(Door const& other) const
+	{
+		//return (other.a == a && other.b == b) || (other.a == b && other.b == a);
+		return (set_a == other.set_a && set_b == other.set_b) ||
+			(set_b == other.set_a && set_a == other.set_b);
+	}
+
+} Door;
 
 /**
  *

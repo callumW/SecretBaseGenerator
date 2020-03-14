@@ -31,8 +31,6 @@ public:
 		m_rand_engine.seed(m_seed);
 	}
 
-	void set_seed(unsigned seed);
-
 	bool insert(T const& obj)
 	{
 		if (!contains(obj)) {
@@ -76,17 +74,23 @@ public:
 
 	T& get_random()
 	{
+		size_t i;
+		return get_random(i);
+	}
+
+	T& get_random(size_t & i)
+	{
 		if (!empty()) {
 			if (size() == 1) {
-				return m_vec[0];
+				i = 0;
+			}
+			else {
+				std::uniform_int_distribution<> dist(0, m_vec.size() - 1);
+				i = dist(m_rand_engine);
 			}
 
-			std::uniform_int_distribution<> dist(0, m_vec.size() - 1);
-			int index = dist(m_rand_engine);
-
-			UE_LOG(LogTemp, Warning, TEXT("returning index: %d"), index);
-
-			return m_vec[index];
+			UE_LOG(LogTemp, Warning, TEXT("returning index: %d"), i);
+			return m_vec[i];
 		}
 		else {
 			throw std::out_of_range("cannot get random value from empty ESet");
