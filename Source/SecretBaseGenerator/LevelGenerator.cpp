@@ -45,12 +45,7 @@ void LevelGenerator::spawn_node_set(ESet<Node>& node_set)
         node_set.insert(current_room);
 
         // calculate adjacent rooms
-        std::vector<Node> adjacents = {
-            {current_room.x, current_room.y-1}, //N
-            {current_room.x+1, current_room.y}, //E
-            {current_room.x, current_room.y+1}, //S
-            {current_room.x-1, current_room.y}, //W
-        };
+        auto adjacents = get_adjacents(current_room);
 
         // add to adjacent room list
         for (auto & r : adjacents) {
@@ -96,29 +91,10 @@ void LevelGenerator::place_rooms(ESet<Node>& node_set)
     UE_LOG(LogTemp, Warning, TEXT("Entering seed growth stage"));
     while (!node_set.empty()) {
         // Get a random seed
-        UE_LOG(LogTemp, Warning, TEXT("node_set size: %d"), node_set.size());
-        for (auto const& node : node_set) {
-            bool is_linked = false;
-            auto adj = get_adjacents(node);
-            for (auto const& seed_obj : seed_rooms) {
-                for (auto n : adj) {
-                    if (seed_obj.first.contains(n)) {
-                        is_linked = true;
-                    }
-                }
-            }
-
-            if (!is_linked) {
-                UE_LOG(LogTemp, Warning, TEXT("Room (%d,%d) is not linked to any seed!"),
-                    node.x,
-                    node.y
-                );
-            }
-        }
 
         auto & seed = seed_rooms.get_random();
         int current_radius = seed.second + 1;
-        UE_LOG(LogTemp, Warning, TEXT("Radius: %d"), current_radius);
+
         seed.second = current_radius;
         auto & seed_nodes = seed.first;
 
