@@ -213,9 +213,10 @@ void LevelGenerator::place_rooms(ESet<Node>& node_set)
                 for (auto & node : seed_rooms[i].first) {
                     auto adjacents = get_adjacents(node);
                     for (auto & neighbor : adjacents) {
-                        if (seed_rooms[j].first.contains(neighbor)) {
+                        auto location = seed_rooms[j].first.where_is(neighbor);
+                        if (location.second) {
                             a_boundary_nodes.insert(node);
-                            b_boundary_nodes.insert(neighbor);
+                            b_boundary_nodes.insert(*(location.first));
                         }
                     }
                 }

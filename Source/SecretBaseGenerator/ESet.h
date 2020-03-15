@@ -8,6 +8,7 @@
 #include <random>
 #include <iterator>
 #include <stdexcept>
+#include <utility>
 
 /**
  * Extensiond of std::set that provides access to a random element
@@ -64,12 +65,18 @@ public:
 
 	bool contains(T const& obj) const
 	{
+		auto loc = where_is(obj);
+		return loc.second;
+	}
+
+	std::pair<typename std::vector<T>::const_iterator, bool> where_is(T const& obj) const
+	{
 		for (auto it = m_vec.begin(); it != m_vec.end(); it++) {
 			if (obj == *it) {
-				return true;
+				return std::make_pair(it, true);
 			}
 		}
-		return false;
+		return std::make_pair(m_vec.end(), false);
 	}
 
 	T& get_random()
