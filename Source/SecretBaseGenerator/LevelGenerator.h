@@ -67,11 +67,11 @@ public:
 	LevelGenerator();
 	~LevelGenerator();
 
-	std::vector<Node> GenerateLevel();
+	std::vector<Node> GenerateLevel(int32 num_nodes, int32 num_rooms, int32 seed);
 
 private:
-	void spawn_node_set(ESet<Node>& node_set);
-	void place_rooms(ESet<Node>& node_set);
+	void spawn_node_set(ESet<Node>& node_set, int32 num_nodes, int32 seed);
+	void place_rooms(ESet<Node>& node_set, int32 num_rooms, int32 seed);
 
 	static std::vector<Node> get_adjacents(Node n);
 };

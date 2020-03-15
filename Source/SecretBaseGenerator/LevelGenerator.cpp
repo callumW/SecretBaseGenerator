@@ -14,21 +14,23 @@ LevelGenerator::~LevelGenerator()
 {
 }
 
-std::vector<Node> LevelGenerator::GenerateLevel()
+std::vector<Node> LevelGenerator::GenerateLevel(int32 num_nodes, int32 num_rooms, int32 seed)
 {
-    ESet<Node> rooms((unsigned) 353424);
+    ESet<Node> rooms((unsigned) seed);
 
-    spawn_node_set(rooms);
+    spawn_node_set(rooms, num_nodes, seed);
 
-    place_rooms(rooms);
+    place_rooms(rooms, num_rooms, seed);
 
     return rooms.to_vector();
 }
 
-void LevelGenerator::spawn_node_set(ESet<Node>& node_set)
+void LevelGenerator::spawn_node_set(ESet<Node>& node_set, int32 num_nodes, int32 seed)
 {
-    const int num_rooms = 60;
-    ESet<Node> adjacent_room_set{};
+    if (num_nodes <= 0) {
+        throw std::invalid_argument("LevelGenerator::spawn_node_set: num_nodes <= 0");
+    }
+    ESet<Node> adjacent_room_set{seed};
     node_set.insert(Node(0, 0));	// add origin so player doesn't fall!
 
     adjacent_room_set.insert(Node(1, 0));
@@ -37,7 +39,7 @@ void LevelGenerator::spawn_node_set(ESet<Node>& node_set)
     adjacent_room_set.insert(Node(0, -1));
 
     uint8 count = 1;
-    while (count <= num_rooms) {
+    while (count <= num_nodes) {
         // pick random room
         auto current_room = adjacent_room_set.get_random();
         adjacent_room_set.erase(current_room);
@@ -63,13 +65,13 @@ std::vector<Node> LevelGenerator::get_adjacents(Node n)
     return {Node(n.x+1, n.y), Node(n.x, n.y+1), Node(n.x-1, n.y), Node(n.x, n.y-1)};
 }
 
-void LevelGenerator::place_rooms(ESet<Node>& node_set)
+void LevelGenerator::place_rooms(ESet<Node>& node_set, int32 num_rooms, int32 seed)
 {
 
     const unsigned target_num_rooms = 5;
 
     ESet<std::pair<ESet<Node>, int>> seed_rooms(target_num_rooms,
-                                                std::make_pair<ESet<Node>, int>({},0));
+                                                std::make_pair<ESet<Node>, int>({seed},0));
 
     unsigned count = 0;
     while (count < target_num_rooms) {
@@ -92,11 +94,11 @@ void LevelGenerator::place_rooms(ESet<Node>& node_set)
     while (!node_set.empty()) {
         // Get a random seed
 
-        auto & seed = seed_rooms.get_random();
-        int current_radius = seed.second + 1;
+        auto & seed_node = seed_rooms.get_random();
+        int current_radius = seed_node.second + 1;
 
-        seed.second = current_radius;
-        auto & seed_nodes = seed.first;
+        seed_node.second = current_radius;
+        auto & seed_nodes = seed_node.first;
 
 
         /** Get nodes **/
@@ -106,7 +108,7 @@ void LevelGenerator::place_rooms(ESet<Node>& node_set)
         int min_y = seed_nodes[0].y - current_radius;
         int max_y = seed_nodes[0].y + current_radius;
 
-        ESet<Node> new_nodes;
+        ESet<Node> new_nodes(seed);
 
         for (int x = min_x; x <= max_x; x++) {
             Node one(x, min_y);
@@ -175,12 +177,12 @@ void LevelGenerator::place_rooms(ESet<Node>& node_set)
 
     UE_LOG(LogTemp, Warning, TEXT("Calculating doors"));
 
-    ESet<Door> all_doors;
+    ESet<Door> all_doors(seed);
 
     for (int i = 0; i < seed_rooms.size(); i++) {
         for (int j = 0; j < seed_rooms.size(); j++) {
-            ESet<Node> a_boundary_nodes;
-            ESet<Node> b_boundary_nodes;
+            ESet<Node> a_boundary_nodes(seed);
+            ESet<Node> b_boundary_nodes(seed);
 
             if (i == j) {
                 continue;
@@ -196,6 +198,10 @@ void LevelGenerator::place_rooms(ESet<Node>& node_set)
                         }
                     }
                 }
+            }
+
+            if (a_boundary_nodes.size() > b_boundary_nodes.size()) {
+                a_boundary_nodes.swap(b_boundary_nodes);
             }
 
             if (!a_boundary_nodes.empty()) {

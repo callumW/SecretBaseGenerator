@@ -28,10 +28,7 @@ void ARoomSpawner::BeginPlay()
 	try {
 		LevelGeneration::LevelGenerator genie;
 
-		auto room_locations = genie.GenerateLevel();
-
-		// std::vector<LevelGeneration::Node> room_locations = {LevelGeneration::Node(0, 0)};
-		// room_locations[0].walls[0] = LevelGeneration::NODE_TYPE::WALL;
+		auto room_locations = genie.GenerateLevel(num_of_nodes, num_rooms_per_level, seed);
 
 		for (auto & loc : room_locations) {
 			FVector location(loc.x * xOffset, loc.y * yOffset, height);
@@ -42,69 +39,9 @@ void ARoomSpawner::BeginPlay()
 		}
 	}
 	catch(std::exception const& e) {
-		UE_LOG(LogTemp, Warning, TEXT("Caught exception: %s"), e.what());
+		auto err_str = FString(e.what());
+		UE_LOG(LogTemp, Warning, TEXT("Caught exception: %s"), *err_str);
 	}
-}
-
-ESet<RoomBlock>  ARoomSpawner::GetRoomLocations()
-{
-	ESet<RoomBlock> room_set;
-	ESet<RoomBlock> adjacent_room_set{(unsigned) seed};
-	room_set.insert(RoomBlock(0.0f, 0.0f));	// add origin so player doesn't fall!
-
-	adjacent_room_set.insert(RoomBlock(1.0f, 0.0f));
-	adjacent_room_set.insert(RoomBlock(0.0f, 1.0f));
-
-	uint8 count = 1;
-	while (count <= num_rooms) {
-		// pick random room
-		auto current_room = adjacent_room_set.get_random();
-		adjacent_room_set.erase(current_room);
-
-		room_set.insert(current_room);
-
-		// calculate adjacent rooms
-		std::vector<RoomBlock> adjacents = {
-			{current_room.x, current_room.y-1},
-			{current_room.x-1, current_room.y},
-			{current_room.x+1, current_room.y},
-			{current_room.x, current_room.y+1},
-		};
-
-		// add to adjacent room list
-		for (auto & r : adjacents) {
-			if (!room_set.contains(r)) {
-				adjacent_room_set.insert(r);
-			}
-		}
-
-		room_set.insert(current_room);
-		count++;
-	}
-
-	// Setup open walls
-	for (auto & room : room_set) {
-		RoomBlock bottom{room.x, room.y-1};
-		RoomBlock left{room.x-1, room.y};
-		RoomBlock right{room.x+1, room.y};
-		RoomBlock top{room.x, room.y+1};
-
-
-		if (room_set.contains(bottom)) {
-			room.walls[2] = WALL_TYPE::DOOR;
-		}
-		if (room_set.contains(left)) {
-			room.walls[3] = WALL_TYPE::DOOR;
-		}
-		if (room_set.contains(right)) {
-			room.walls[1] = WALL_TYPE::DOOR;
-		}
-		if (room_set.contains(top)) {
-			room.walls[0] = WALL_TYPE::DOOR;
-		}
-	}
-
-	return room_set;
 }
 
 // Called every frame

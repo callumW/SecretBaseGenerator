@@ -19,6 +19,12 @@ class SECRETBASEGENERATOR_API ESet
 {
 public:
 
+	ESet(int32 seed = 0)
+		:m_seed(seed)
+	{
+		m_rand_engine.seed(m_seed);
+	}
+
 	ESet(unsigned seed = 0)
 		:m_seed(seed)
 	{
@@ -121,6 +127,11 @@ public:
 	size_t size() const
 	{
 		return m_vec.size();
+	}
+
+	void swap(ESet<T> & other)
+	{
+		m_vec.swap(other.m_vec);
 	}
 
 

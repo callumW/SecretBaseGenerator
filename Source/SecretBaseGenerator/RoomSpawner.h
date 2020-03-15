@@ -21,10 +21,13 @@ public:
 	ARoomSpawner();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	uint8 num_rooms = 10;
+	int32 num_rooms_per_level = 10;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 seed = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 num_of_nodes = 100;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float height = 0.0f;
@@ -38,8 +41,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
-
-	ESet<RoomBlock>  GetRoomLocations();
 
 	TArray<ARoom*> rooms;
 };
