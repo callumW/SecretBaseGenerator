@@ -200,14 +200,21 @@ void LevelGenerator::place_rooms(ESet<Node>& node_set, int32 num_rooms, int32 se
                 }
             }
 
+            std::vector<std::pair<ESet<Node>&, int>> boundary_sets;
             if (a_boundary_nodes.size() > b_boundary_nodes.size()) {
-                a_boundary_nodes.swap(b_boundary_nodes);
+                boundary_sets.push_back(std::pair<ESet<Node>&, int>(b_boundary_nodes, j));
+                boundary_sets.push_back(std::pair<ESet<Node>&, int>(a_boundary_nodes, i));
+            }
+            else {
+                boundary_sets.push_back(std::pair<ESet<Node>&, int>(a_boundary_nodes, i));
+                boundary_sets.push_back(std::pair<ESet<Node>&, int>(b_boundary_nodes, j));
             }
 
-            if (!a_boundary_nodes.empty()) {
+
+            if (!boundary_sets[0].first.empty()) {
                 size_t node_index = 0;
-                auto node_a = a_boundary_nodes.get_random(node_index);
-                auto node_b = b_boundary_nodes[node_index];
+                auto node_a = boundary_sets[0].first.get_random(node_index);
+                auto node_b = boundary_sets[1].first[node_index];
 
                 if (node_a.x < node_b.x) {  // door to north
                     node_a.walls[0] = NODE_TYPE::DOOR;
@@ -229,8 +236,8 @@ void LevelGenerator::place_rooms(ESet<Node>& node_set, int32 num_rooms, int32 se
                 Door door = {
                     node_a,
                     node_b,
-                    i,
-                    j
+                    boundary_sets[0].second,
+                    boundary_sets[1].second
                 };
 
                 all_doors.insert(door);
