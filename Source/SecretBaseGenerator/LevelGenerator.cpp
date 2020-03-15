@@ -159,16 +159,16 @@ void LevelGenerator::place_rooms(ESet<Node>& node_set, int32 num_rooms, int32 se
             auto adjacents = get_adjacents(node);
 
             if (!seed_set.contains(adjacents[0])) {
-                node.walls[0] = NODE_TYPE::WALL;
+                node.walls[0] = WALL_TYPE::WALL;
             }
             if (!seed_set.contains(adjacents[1])) {
-                node.walls[1] = NODE_TYPE::WALL;
+                node.walls[1] = WALL_TYPE::WALL;
             }
             if (!seed_set.contains(adjacents[2])) {
-                node.walls[2] = NODE_TYPE::WALL;
+                node.walls[2] = WALL_TYPE::WALL;
             }
             if (!seed_set.contains(adjacents[3])) {
-                node.walls[3] = NODE_TYPE::WALL;
+                node.walls[3] = WALL_TYPE::WALL;
             }
 
             node_set.insert(node);
@@ -217,20 +217,20 @@ void LevelGenerator::place_rooms(ESet<Node>& node_set, int32 num_rooms, int32 se
                 auto node_b = boundary_sets[1].first[node_index];
 
                 if (node_a.x < node_b.x) {  // door to north
-                    node_a.walls[0] = NODE_TYPE::DOOR;
-                    node_b.walls[2] = NODE_TYPE::DOOR;
+                    node_a.walls[0] = WALL_TYPE::DOOR;
+                    node_b.walls[2] = WALL_TYPE::DOOR;
                 }
                 else if (node_a.x > node_b.x) {
-                    node_a.walls[2] = NODE_TYPE::DOOR;
-                    node_b.walls[0] = NODE_TYPE::DOOR;
+                    node_a.walls[2] = WALL_TYPE::DOOR;
+                    node_b.walls[0] = WALL_TYPE::DOOR;
                 }
                 else if (node_a.y < node_b.y) {
-                    node_a.walls[1] = NODE_TYPE::DOOR;
-                    node_b.walls[3] = NODE_TYPE::DOOR;
+                    node_a.walls[1] = WALL_TYPE::DOOR;
+                    node_b.walls[3] = WALL_TYPE::DOOR;
                 }
                 else if (node_a.y > node_b.y) {
-                    node_a.walls[3] = NODE_TYPE::DOOR;
-                    node_b.walls[1] = NODE_TYPE::DOOR;
+                    node_a.walls[3] = WALL_TYPE::DOOR;
+                    node_b.walls[1] = WALL_TYPE::DOOR;
                 }
 
                 Door door = {

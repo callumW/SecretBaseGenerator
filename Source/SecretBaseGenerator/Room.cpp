@@ -28,18 +28,18 @@ ARoom::ARoom()
 	}
 }
 
-void ARoom::LoadWall(FVector loc, FRotator rotation, FName name, LevelGeneration::NODE_TYPE const type)
+void ARoom::LoadWall(FVector loc, FRotator rotation, FName name, LevelGeneration::WALL_TYPE const type)
 {
 	TCHAR const * mesh_name = nullptr;
 
 	switch(type) {
-		case LevelGeneration::NODE_TYPE::WALL:
+		case LevelGeneration::WALL_TYPE::WALL:
 			mesh_name = TEXT("StaticMesh'/Game/Models/wall.wall'");
 			break;
-		case LevelGeneration::NODE_TYPE::DOOR:
+		case LevelGeneration::WALL_TYPE::DOOR:
 			mesh_name = TEXT("StaticMesh'/Game/Models/wall_door.wall_door'");
 			break;
-		case LevelGeneration::NODE_TYPE::NONE:	// no wall needed
+		case LevelGeneration::WALL_TYPE::NONE:	// no wall needed
 			return;
 		default:
 			UE_LOG(LogTemp, Warning, TEXT("unknown wall type"));

@@ -42,5 +42,5 @@ public:
 
 private:
 
-	TArray<ARoom*> rooms;
+	TArray<AActor*> rooms;
 };

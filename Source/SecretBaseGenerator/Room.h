@@ -56,7 +56,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
-	void LoadWall(FVector loc, FRotator rotation, FName name, LevelGeneration::NODE_TYPE const type);
+	void LoadWall(FVector loc, FRotator rotation, FName name, LevelGeneration::WALL_TYPE const type);
 	void LoadCeiling();
 	void LoadLight();
 

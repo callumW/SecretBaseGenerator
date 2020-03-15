@@ -10,17 +10,24 @@
 
 namespace LevelGeneration {
 
-enum class NODE_TYPE {
+enum class WALL_TYPE {
 	NONE,
 	WALL,
 	DOOR
+};
+
+enum class NODE_TYPE {
+	ROOM,
+	STAIR_WELL
 };
 
 
 typedef struct Node {
 	int x, y;
 	// N (+x), E (+y), S(-x), W (-y)
-	NODE_TYPE walls[4] = {NODE_TYPE::NONE};
+	WALL_TYPE walls[4] = {WALL_TYPE::NONE};
+
+	NODE_TYPE type = NODE_TYPE::ROOM;
 
 	Node(int x_val, int y_val)
 	{
@@ -37,7 +44,8 @@ typedef struct Node {
 	{
 		x = other.x;
 		y = other.y;
-		std::memcpy((void*) walls, (void const*) other.walls, sizeof(NODE_TYPE) * 4);
+		std::memcpy((void*) walls, (void const*) other.walls, sizeof(WALL_TYPE) * 4);
+		type = other.type;
 	}
 } Node;
 

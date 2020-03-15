@@ -28,14 +28,19 @@ void ARoomSpawner::BeginPlay()
 	try {
 		LevelGeneration::LevelGenerator genie;
 
-		auto room_locations = genie.GenerateLevel(num_of_nodes, num_rooms_per_level, seed);
+		auto nodes = genie.GenerateLevel(num_of_nodes, num_rooms_per_level, seed);
 
-		for (auto & loc : room_locations) {
-			FVector location(loc.x * xOffset, loc.y * yOffset, height);
-			ARoom* tmp = (ARoom*) GetWorld()->SpawnActor(ARoom::StaticClass());
-			tmp->Initialize(loc);
-			tmp->SetActorLocation(location);
-			rooms.Add(tmp);
+		for (auto & node : nodes) {
+			if (node.type == LevelGeneration::NODE_TYPE::ROOM) {
+				FVector location(node.x * xOffset, node.y * yOffset, height);
+				ARoom* tmp = (ARoom*) GetWorld()->SpawnActor(ARoom::StaticClass());
+				tmp->Initialize(node);
+				tmp->SetActorLocation(location);
+				rooms.Add(tmp);
+			}
+			else if (node.type == LevelGeneration::NODE_TYPE::STAIR_WELL) {
+				
+			}
 		}
 	}
 	catch(std::exception const& e) {
