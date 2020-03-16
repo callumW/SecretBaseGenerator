@@ -6,6 +6,25 @@
 
 namespace LevelGeneration {
 
+Room::Room(ESet<Node> const & nodes)
+{
+    m_nodes = nodes;
+    for (auto & n : m_nodes) {
+        auto neigbhour_nodes = LevelGenerator::get_adjacents(n);
+        for (auto const & neighbour : neigbhour_nodes) {
+            if (!m_nodes.contains(neighbour)) { // if node has an adjacent node that is NOT in node set, it is a perimeter node
+                m_perimeter_nodes.insert(n);
+                break;
+            }
+        }
+    }
+}
+
+bool Room::operator==(Room const & other) const
+{
+    return m_nodes == other.m_nodes;
+}
+
 LevelGenerator::LevelGenerator()
 {
 }
@@ -30,7 +49,7 @@ void LevelGenerator::spawn_node_set(ESet<Node>& node_set, int32 num_nodes, int32
     if (num_nodes <= 0) {
         throw std::invalid_argument("LevelGenerator::spawn_node_set: num_nodes <= 0");
     }
-    ESet<Node> adjacent_room_set{seed};
+    ESet<Node> adjacent_room_set{(unsigned)seed};
     node_set.insert(Node(0, 0));	// add origin so player doesn't fall!
 
     adjacent_room_set.insert(Node(1, 0));
@@ -71,7 +90,7 @@ void LevelGenerator::place_rooms(ESet<Node>& node_set, int32 num_rooms, int32 se
     const unsigned target_num_rooms = 5;
 
     ESet<std::pair<ESet<Node>, int>> seed_rooms(target_num_rooms,
-                                                std::make_pair<ESet<Node>, int>({seed},0));
+                                                std::make_pair<ESet<Node>, int>({(unsigned)seed},0));
 
     unsigned count = 0;
     while (count < target_num_rooms) {
@@ -108,7 +127,7 @@ void LevelGenerator::place_rooms(ESet<Node>& node_set, int32 num_rooms, int32 se
         int min_y = seed_nodes[0].y - current_radius;
         int max_y = seed_nodes[0].y + current_radius;
 
-        ESet<Node> new_nodes(seed);
+        ESet<Node> new_nodes((unsigned)seed);
 
         for (int x = min_x; x <= max_x; x++) {
             Node one(x, min_y);
@@ -177,12 +196,12 @@ void LevelGenerator::place_rooms(ESet<Node>& node_set, int32 num_rooms, int32 se
 
     UE_LOG(LogTemp, Warning, TEXT("Calculating doors"));
 
-    ESet<Door> all_doors(seed);
+    ESet<Door> all_doors((unsigned)seed);
 
     for (int i = 0; i < seed_rooms.size(); i++) {
         for (int j = 0; j < seed_rooms.size(); j++) {
-            ESet<Node> a_boundary_nodes(seed);
-            ESet<Node> b_boundary_nodes(seed);
+            ESet<Node> a_boundary_nodes((unsigned)seed);
+            ESet<Node> b_boundary_nodes((unsigned)seed);
 
             if (i == j) {
                 continue;

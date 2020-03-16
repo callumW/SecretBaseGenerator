@@ -10,19 +10,18 @@
 #include <stdexcept>
 #include <utility>
 
-/**
- * Extensiond of std::set that provides access to a random element
- */
 template <class T>
 
 class SECRETBASEGENERATOR_API ESet
 {
 public:
 
-	ESet(int32 seed = 0)
-		:m_seed(seed)
+
+	ESet(ESet const & other)
 	{
-		m_rand_engine.seed(m_seed);
+		m_vec = other.m_vec;
+		m_seed = other.m_seed;
+		m_rand_engine = other.m_rand_engine;
 	}
 
 	ESet(unsigned seed = 0)
@@ -31,14 +30,14 @@ public:
 		m_rand_engine.seed(m_seed);
 	}
 
-	ESet(size_t count, T const& obj, unsigned seed = 0)
+	ESet(size_t count, T const & obj, unsigned seed = 0)
 		:m_vec(count, obj),
 		m_seed(seed)
 	{
 		m_rand_engine.seed(m_seed);
 	}
 
-	bool insert(T const& obj)
+	bool insert(T const & obj)
 	{
 		if (!contains(obj)) {
 			m_vec.push_back(obj);
@@ -58,7 +57,7 @@ public:
 		}
 	}
 
-	void replace(T const& obj)
+	void replace(T const & obj)
 	{
 		erase(obj);
 		insert(obj);
@@ -69,13 +68,13 @@ public:
 
 	typename std::vector<T>::iterator erase(typename std::vector<T>::iterator it) { return m_vec.erase(it); }
 
-	bool contains(T const& obj) const
+	bool contains(T const & obj) const
 	{
 		auto loc = where_is(obj);
 		return loc.second;
 	}
 
-	std::pair<typename std::vector<T>::const_iterator, bool> where_is(T const& obj) const
+	std::pair<typename std::vector<T>::const_iterator, bool> where_is(T const & obj) const
 	{
 		for (auto it = m_vec.begin(); it != m_vec.end(); it++) {
 			if (obj == *it) {
@@ -132,6 +131,11 @@ public:
 	void swap(ESet<T> & other)
 	{
 		m_vec.swap(other.m_vec);
+	}
+
+	bool operator==(ESet<T> const & other) const
+	{
+		return m_vec == other.m_vec;
 	}
 
 

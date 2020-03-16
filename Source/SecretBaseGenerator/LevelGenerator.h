@@ -65,6 +65,18 @@ typedef struct Door {
 
 } Door;
 
+class Room {
+public:
+	Room(ESet<Node> const & nodes);
+
+
+	bool operator==(Room const& other) const;
+private:
+	ESet<Node> m_nodes;
+	ESet<Node> m_perimeter_nodes;
+	ESet<Room> m_neighbours;
+};
+
 /**
  *
  */
@@ -77,11 +89,11 @@ public:
 
 	std::vector<Node> GenerateLevel(int32 num_nodes, int32 num_rooms, int32 seed);
 
+	static std::vector<Node> get_adjacents(Node n);
+
 private:
 	void spawn_node_set(ESet<Node>& node_set, int32 num_nodes, int32 seed);
 	void place_rooms(ESet<Node>& node_set, int32 num_rooms, int32 seed);
-
-	static std::vector<Node> get_adjacents(Node n);
 };
 
 }
