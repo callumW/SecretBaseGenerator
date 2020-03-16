@@ -66,6 +66,9 @@ public:
 	typename std::vector<T>::iterator begin() { return m_vec.begin(); }
 	typename std::vector<T>::iterator end() { return m_vec.end(); }
 
+	typename std::vector<T>::const_iterator begin() const { return m_vec.begin(); }
+	typename std::vector<T>::const_iterator end() const { return m_vec.end(); }
+
 	typename std::vector<T>::iterator erase(typename std::vector<T>::iterator it) { return m_vec.erase(it); }
 
 	bool contains(T const & obj) const

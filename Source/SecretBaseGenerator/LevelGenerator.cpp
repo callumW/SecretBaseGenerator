@@ -20,6 +20,19 @@ Room::Room(ESet<Node> const & nodes)
     }
 }
 
+bool Room::neighbours(Room const & other) const
+{
+    for (auto const & n : m_perimeter_nodes) {
+        auto adjacents = LevelGenerator::get_adjacents(n);
+        for (auto const & adj : adjacents) {
+            if (other.m_perimeter_nodes.contains(adj)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 bool Room::operator==(Room const & other) const
 {
     return m_nodes == other.m_nodes;
@@ -201,81 +214,87 @@ ESet<Room> LevelGenerator::generate_rooms(ESet<Node>& node_set, int32 num_rooms,
     }
 
     return rooms;
+}
+
+void LevelGenerator::place_doors(ESet<Room>& rooms)
+{
 
     UE_LOG(LogTemp, Warning, TEXT("Calculating doors"));
 
-    ESet<Door> all_doors((unsigned)seed);
-
-    for (int i = 0; i < seed_rooms.size(); i++) {
-        for (int j = 0; j < seed_rooms.size(); j++) {
-            ESet<Node> a_boundary_nodes((unsigned)seed);
-            ESet<Node> b_boundary_nodes((unsigned)seed);
-
-            if (i == j) {
-                continue;
-            }
-            else {
-                for (auto & node : seed_rooms[i].first) {
-                    auto adjacents = get_adjacents(node);
-                    for (auto & neighbor : adjacents) {
-                        auto location = seed_rooms[j].first.where_is(neighbor);
-                        if (location.second) {
-                            a_boundary_nodes.insert(node);
-                            b_boundary_nodes.insert(*(location.first));
-                        }
-                    }
-                }
-            }
-
-            std::vector<std::pair<ESet<Node>&, int>> boundary_sets;
-            if (a_boundary_nodes.size() > b_boundary_nodes.size()) {
-                boundary_sets.push_back(std::pair<ESet<Node>&, int>(b_boundary_nodes, j));
-                boundary_sets.push_back(std::pair<ESet<Node>&, int>(a_boundary_nodes, i));
-            }
-            else {
-                boundary_sets.push_back(std::pair<ESet<Node>&, int>(a_boundary_nodes, i));
-                boundary_sets.push_back(std::pair<ESet<Node>&, int>(b_boundary_nodes, j));
-            }
+    ESet<Door> all_doors;
 
 
-            if (!boundary_sets[0].first.empty()) {
-                size_t node_index = 0;
-                auto node_a = boundary_sets[0].first.get_random(node_index);
-                auto node_b = boundary_sets[1].first[node_index];
 
-                if (node_a.x < node_b.x) {  // door to north
-                    node_a.walls[0] = WALL_TYPE::DOOR;
-                    node_b.walls[2] = WALL_TYPE::DOOR;
-                }
-                else if (node_a.x > node_b.x) {
-                    node_a.walls[2] = WALL_TYPE::DOOR;
-                    node_b.walls[0] = WALL_TYPE::DOOR;
-                }
-                else if (node_a.y < node_b.y) {
-                    node_a.walls[1] = WALL_TYPE::DOOR;
-                    node_b.walls[3] = WALL_TYPE::DOOR;
-                }
-                else if (node_a.y > node_b.y) {
-                    node_a.walls[3] = WALL_TYPE::DOOR;
-                    node_b.walls[1] = WALL_TYPE::DOOR;
-                }
-
-                Door door = {
-                    node_a,
-                    node_b,
-                    boundary_sets[0].second,
-                    boundary_sets[1].second
-                };
-
-                all_doors.insert(door);
-            }
-        }
-    }
-
-    for (auto & door : all_doors) {
-        node_set.replace(door.a);
-        node_set.replace(door.b);
-    }
+    // for (int i = 0; i < seed_rooms.size(); i++) {
+    //     for (int j = 0; j < seed_rooms.size(); j++) {
+    //         ESet<Node> a_boundary_nodes((unsigned)seed);
+    //         ESet<Node> b_boundary_nodes((unsigned)seed);
+    //
+    //         if (i == j) {
+    //             continue;
+    //         }
+    //         else {
+    //             for (auto & node : seed_rooms[i].first) {
+    //                 auto adjacents = get_adjacents(node);
+    //                 for (auto & neighbor : adjacents) {
+    //                     auto location = seed_rooms[j].first.where_is(neighbor);
+    //                     if (location.second) {
+    //                         a_boundary_nodes.insert(node);
+    //                         b_boundary_nodes.insert(*(location.first));
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //
+    //         std::vector<std::pair<ESet<Node>&, int>> boundary_sets;
+    //         if (a_boundary_nodes.size() > b_boundary_nodes.size()) {
+    //             boundary_sets.push_back(std::pair<ESet<Node>&, int>(b_boundary_nodes, j));
+    //             boundary_sets.push_back(std::pair<ESet<Node>&, int>(a_boundary_nodes, i));
+    //         }
+    //         else {
+    //             boundary_sets.push_back(std::pair<ESet<Node>&, int>(a_boundary_nodes, i));
+    //             boundary_sets.push_back(std::pair<ESet<Node>&, int>(b_boundary_nodes, j));
+    //         }
+    //
+    //
+    //         if (!boundary_sets[0].first.empty()) {
+    //             size_t node_index = 0;
+    //             auto node_a = boundary_sets[0].first.get_random(node_index);
+    //             auto node_b = boundary_sets[1].first[node_index];
+    //
+    //             if (node_a.x < node_b.x) {  // door to north
+    //                 node_a.walls[0] = WALL_TYPE::DOOR;
+    //                 node_b.walls[2] = WALL_TYPE::DOOR;
+    //             }
+    //             else if (node_a.x > node_b.x) {
+    //                 node_a.walls[2] = WALL_TYPE::DOOR;
+    //                 node_b.walls[0] = WALL_TYPE::DOOR;
+    //             }
+    //             else if (node_a.y < node_b.y) {
+    //                 node_a.walls[1] = WALL_TYPE::DOOR;
+    //                 node_b.walls[3] = WALL_TYPE::DOOR;
+    //             }
+    //             else if (node_a.y > node_b.y) {
+    //                 node_a.walls[3] = WALL_TYPE::DOOR;
+    //                 node_b.walls[1] = WALL_TYPE::DOOR;
+    //             }
+    //
+    //             Door door = {
+    //                 node_a,
+    //                 node_b,
+    //                 boundary_sets[0].second,
+    //                 boundary_sets[1].second
+    //             };
+    //
+    //             all_doors.insert(door);
+    //         }
+    //     }
+    // }
+    //
+    // for (auto & door : all_doors) {
+    //     node_set.replace(door.a);
+    //     node_set.replace(door.b);
+    // }
 }
 
 }

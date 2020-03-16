@@ -69,12 +69,12 @@ class Room {
 public:
 	Room(ESet<Node> const & nodes);
 
+	bool neighbours(Room const & other) const;
 
 	bool operator==(Room const& other) const;
 private:
 	ESet<Node> m_nodes;
 	ESet<Node> m_perimeter_nodes;
-	ESet<Room> m_neighbours;
 };
 
 /**
@@ -94,6 +94,7 @@ public:
 private:
 	void spawn_node_set(ESet<Node>& node_set, int32 num_nodes, int32 seed);
 	ESet<Room> generate_rooms(ESet<Node>& node_set, int32 num_rooms, int32 seed);
+	void place_doors(ESet<Room>& rooms);
 };
 
 }
