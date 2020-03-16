@@ -35,13 +35,13 @@ LevelGenerator::~LevelGenerator()
 
 std::vector<Node> LevelGenerator::GenerateLevel(int32 num_nodes, int32 num_rooms, int32 seed)
 {
-    ESet<Node> rooms((unsigned) seed);
+    ESet<Node> nodes((unsigned) seed);
 
-    spawn_node_set(rooms, num_nodes, seed);
+    spawn_node_set(nodes, num_nodes, seed);
 
-    place_rooms(rooms, num_rooms, seed);
+    auto rooms = generate_rooms(nodes, num_rooms, seed);
 
-    return rooms.to_vector();
+    return nodes.to_vector();
 }
 
 void LevelGenerator::spawn_node_set(ESet<Node>& node_set, int32 num_nodes, int32 seed)
@@ -84,7 +84,7 @@ std::vector<Node> LevelGenerator::get_adjacents(Node n)
     return {Node(n.x+1, n.y), Node(n.x, n.y+1), Node(n.x-1, n.y), Node(n.x, n.y-1)};
 }
 
-void LevelGenerator::place_rooms(ESet<Node>& node_set, int32 num_rooms, int32 seed)
+ESet<Room> LevelGenerator::generate_rooms(ESet<Node>& node_set, int32 num_rooms, int32 seed)
 {
 
     const unsigned target_num_rooms = 5;
@@ -193,6 +193,14 @@ void LevelGenerator::place_rooms(ESet<Node>& node_set, int32 num_rooms, int32 se
             node_set.insert(node);
         }
     }
+
+    ESet<Room> rooms;
+
+    for (auto const& seed_obj : seed_rooms) {
+        rooms.insert(Room(seed_obj.first));
+    }
+
+    return rooms;
 
     UE_LOG(LogTemp, Warning, TEXT("Calculating doors"));
 
