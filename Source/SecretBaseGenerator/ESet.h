@@ -87,6 +87,16 @@ public:
 		return std::make_pair(m_vec.end(), false);
 	}
 
+	std::pair<typename std::vector<T>::iterator, bool> where_is(T const & obj)
+	{
+		for (auto it = m_vec.begin(); it != m_vec.end(); it++) {
+			if (obj == *it) {
+				return std::make_pair(it, true);
+			}
+		}
+		return std::make_pair(m_vec.end(), false);
+	}
+
 	T& get_random()
 	{
 		size_t i;

@@ -49,22 +49,6 @@ typedef struct Node {
 	}
 } Node;
 
-typedef struct Door {
-	Node a;
-	Node b;
-
-	int set_a;
-	int set_b;
-
-	bool operator==(Door const& other) const
-	{
-		//return (other.a == a && other.b == b) || (other.a == b && other.b == a);
-		return (set_a == other.set_a && set_b == other.set_b) ||
-			(set_b == other.set_a && set_a == other.set_b);
-	}
-
-} Door;
-
 class Room {
 public:
 	Room(ESet<Node> const & nodes);
@@ -74,16 +58,32 @@ public:
 	/**
 	 * Get node contained within the room that neighbours the passed node
 	 * @param n node external to this room but adjacent to the perimeter of the room
-	 * @returns neighbour node
-	 * @throws std::invalid_argument if n is not neighbouring any node in the room
+	 * @returns neighbour node or null if no neighbour found
 	 */
-	Node& get_neighbour(Node const & n);
+	Node* get_neighbour(Node const & n);
+
+	std::pair<Node*, Node*> get_neighbouring_nodes(Room & other);
 
 	bool operator==(Room const& other) const;
+	bool operator!=(Room const& other) const { return !(*this == other); }
 
 	ESet<Node> m_nodes;
 	ESet<Node> m_perimeter_nodes;
 };
+
+typedef struct Door {
+	Room* room_a = nullptr;
+	Room* room_b = nullptr;
+
+	Node* node_a = nullptr;
+	Node* node_b = nullptr;
+
+	bool operator==(Door const& other) const
+	{
+		return (other.room_a == room_a && other.room_b == room_b) ||
+			(other.room_b == room_a && other.room_a == room_b);
+	}
+} Door;
 
 /**
  *

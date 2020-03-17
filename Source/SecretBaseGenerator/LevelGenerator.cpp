@@ -11,21 +11,25 @@ Room::Room(ESet<Node> const & nodes)
     m_nodes = nodes;
     for (auto & n : m_nodes) {
         auto neighbour_nodes = LevelGenerator::get_adjacents(n);
-
+        bool is_perimeter_node = false;
         if (!m_nodes.contains(neighbour_nodes[0])) {
             n.walls[0] = WALL_TYPE::WALL;
-            m_perimeter_nodes.insert(n);
+            is_perimeter_node = true;
         }
         if (!m_nodes.contains(neighbour_nodes[1])) {
             n.walls[1] = WALL_TYPE::WALL;
-            m_perimeter_nodes.insert(n);
+            is_perimeter_node = true;
         }
         if (!m_nodes.contains(neighbour_nodes[2])) {
             n.walls[2] = WALL_TYPE::WALL;
-            m_perimeter_nodes.insert(n);
+            is_perimeter_node = true;
         }
         if (!m_nodes.contains(neighbour_nodes[3])) {
             n.walls[3] = WALL_TYPE::WALL;
+            is_perimeter_node = true;
+        }
+
+        if (is_perimeter_node) {
             m_perimeter_nodes.insert(n);
         }
     }
@@ -43,6 +47,33 @@ bool Room::neighbours(Room const & other) const
         }
     }
     return false;
+}
+
+Node* Room::get_neighbour(Node const & n)
+{
+    auto adjacent_nodes = LevelGenerator::get_adjacents(n);
+
+    for (auto & adjacent : adjacent_nodes) {
+        auto loc = m_perimeter_nodes.where_is(adjacent);
+
+        if (loc.second) {
+            return &(*loc.first);
+        }
+    }
+
+    return nullptr;
+}
+
+std::pair<Node*, Node*> Room::get_neighbouring_nodes(Room & other)
+{
+    Node* this_node = nullptr;
+    Node* other_node = nullptr;
+    while (other_node == nullptr) {
+        this_node = &m_perimeter_nodes.get_random();
+        other_node = get_neighbour(*this_node);
+    }
+
+    return std::make_pair(this_node, other_node);
 }
 
 bool Room::operator==(Room const & other) const
@@ -66,11 +97,17 @@ std::vector<Node> LevelGenerator::GenerateLevel(int32 num_nodes, int32 num_rooms
 
     auto rooms = generate_rooms(nodes, num_rooms, seed);
 
+    place_doors(rooms);
+
     nodes.clear();
 
     for ( auto & room : rooms ) {
         for ( auto & n : room.m_nodes ) {
             nodes.insert(n);
+        }
+
+        for ( auto & n : room.m_perimeter_nodes ) {
+            nodes.replace(n);
         }
     }
 
@@ -204,12 +241,12 @@ ESet<Room> LevelGenerator::generate_rooms(ESet<Node>& node_set, int32 num_rooms,
         }
     }
 
-    UE_LOG(LogTemp, Warning, TEXT("Total room count: %u"), node_set.size());
-
     ESet<Room> rooms;
     for (auto const& seed_obj : seed_rooms) {
         rooms.insert(Room(seed_obj.first));
     }
+
+    UE_LOG(LogTemp, Warning, TEXT("Total room count: %u"), rooms.size());
 
     return rooms;
 }
@@ -219,82 +256,63 @@ void LevelGenerator::place_doors(ESet<Room>& rooms)
 
     UE_LOG(LogTemp, Warning, TEXT("Calculating doors"));
 
+    // Calculate neighbour information
+    typedef std::pair<Room*, std::vector<Room*>> neighbour_data;
+    std::vector<neighbour_data> neighbour_lists;
+
+    for (auto & room : rooms) {
+        neighbour_data neighbour_list{&room, {}};
+        for (auto & potential_neighbour : rooms) {
+            if (potential_neighbour != room
+                && room.neighbours(potential_neighbour)) {
+                neighbour_list.second.push_back(&potential_neighbour);
+            }
+        }
+        neighbour_lists.push_back(neighbour_list);
+    }
+
+    UE_LOG(LogTemp, Display, TEXT("Number of neighbours: %d"), neighbour_lists.size());
+
     ESet<Door> all_doors;
 
-    // TODO need to check evaluated rooms?
+    for (auto & neighbour_list : neighbour_lists) {
+        for (auto & neighbour : neighbour_list.second) {
+            Door current_door;
+            current_door.room_a = neighbour_list.first;
+            current_door.room_b = neighbour;
 
-    // to for each room, look at neighbours and pick a random room to add.
+            auto neighbour_nodes = current_door.room_a->get_neighbouring_nodes(*current_door.room_b);
 
-    // for (int i = 0; i < seed_rooms.size(); i++) {
-    //     for (int j = 0; j < seed_rooms.size(); j++) {
-    //         ESet<Node> a_boundary_nodes((unsigned)seed);
-    //         ESet<Node> b_boundary_nodes((unsigned)seed);
-    //
-    //         if (i == j) {
-    //             continue;
-    //         }
-    //         else {
-    //             for (auto & node : seed_rooms[i].first) {
-    //                 auto adjacents = get_adjacents(node);
-    //                 for (auto & neighbor : adjacents) {
-    //                     auto location = seed_rooms[j].first.where_is(neighbor);
-    //                     if (location.second) {
-    //                         a_boundary_nodes.insert(node);
-    //                         b_boundary_nodes.insert(*(location.first));
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //
-    //         std::vector<std::pair<ESet<Node>&, int>> boundary_sets;
-    //         if (a_boundary_nodes.size() > b_boundary_nodes.size()) {
-    //             boundary_sets.push_back(std::pair<ESet<Node>&, int>(b_boundary_nodes, j));
-    //             boundary_sets.push_back(std::pair<ESet<Node>&, int>(a_boundary_nodes, i));
-    //         }
-    //         else {
-    //             boundary_sets.push_back(std::pair<ESet<Node>&, int>(a_boundary_nodes, i));
-    //             boundary_sets.push_back(std::pair<ESet<Node>&, int>(b_boundary_nodes, j));
-    //         }
-    //
-    //
-    //         if (!boundary_sets[0].first.empty()) {
-    //             size_t node_index = 0;
-    //             auto node_a = boundary_sets[0].first.get_random(node_index);
-    //             auto node_b = boundary_sets[1].first[node_index];
-    //
-    //             if (node_a.x < node_b.x) {  // door to north
-    //                 node_a.walls[0] = WALL_TYPE::DOOR;
-    //                 node_b.walls[2] = WALL_TYPE::DOOR;
-    //             }
-    //             else if (node_a.x > node_b.x) {
-    //                 node_a.walls[2] = WALL_TYPE::DOOR;
-    //                 node_b.walls[0] = WALL_TYPE::DOOR;
-    //             }
-    //             else if (node_a.y < node_b.y) {
-    //                 node_a.walls[1] = WALL_TYPE::DOOR;
-    //                 node_b.walls[3] = WALL_TYPE::DOOR;
-    //             }
-    //             else if (node_a.y > node_b.y) {
-    //                 node_a.walls[3] = WALL_TYPE::DOOR;
-    //                 node_b.walls[1] = WALL_TYPE::DOOR;
-    //             }
-    //
-    //             Door door = {
-    //                 node_a,
-    //                 node_b,
-    //                 boundary_sets[0].second,
-    //                 boundary_sets[1].second
-    //             };
-    //
-    //             all_doors.insert(door);
-    //         }
-    //     }
-    // }
-    //
-    // for (auto & door : all_doors) {
-    //     node_set.replace(door.a);
-    //     node_set.replace(door.b);
-    // }
+            current_door.node_a = neighbour_nodes.first;
+            current_door.node_b = neighbour_nodes.second;
+
+            all_doors.insert(current_door);
+        }
+    }
+
+    for (auto & door : all_doors) {
+        if (door.node_a->x > door.node_b->x) {    // node a is north
+            door.node_a->walls[2] = WALL_TYPE::DOOR;
+            door.node_b->walls[0] = WALL_TYPE::DOOR;
+        }
+        if (door.node_a->x < door.node_b->x) {    // node a is south
+            door.node_a->walls[0] = WALL_TYPE::DOOR;
+            door.node_b->walls[2] = WALL_TYPE::DOOR;
+        }
+        if (door.node_a->y > door.node_b->y) {    // node a is east
+            door.node_a->walls[3] = WALL_TYPE::DOOR;
+            door.node_b->walls[1] = WALL_TYPE::DOOR;
+        }
+        if (door.node_a->y < door.node_b->y) {    // node a is west
+            door.node_a->walls[1] = WALL_TYPE::DOOR;
+            door.node_b->walls[3] = WALL_TYPE::DOOR;
+        }
+
+        door.room_a->m_perimeter_nodes.replace(*door.node_a);
+        door.room_b->m_perimeter_nodes.replace(*door.node_b);
+    }
+
+    UE_LOG(LogTemp, Display, TEXT("Number of doors: %d"), all_doors.size());
 }
 
 }
