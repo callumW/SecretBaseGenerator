@@ -141,6 +141,11 @@ public:
 		return m_vec == other.m_vec;
 	}
 
+	void clear()
+	{
+		m_vec.clear();
+	}
+
 
 	std::vector<T> to_vector() const { return m_vec; }
 

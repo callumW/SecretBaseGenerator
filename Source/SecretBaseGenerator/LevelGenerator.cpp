@@ -10,14 +10,26 @@ Room::Room(ESet<Node> const & nodes)
 {
     m_nodes = nodes;
     for (auto & n : m_nodes) {
-        auto neigbhour_nodes = LevelGenerator::get_adjacents(n);
-        for (auto const & neighbour : neigbhour_nodes) {
-            if (!m_nodes.contains(neighbour)) { // if node has an adjacent node that is NOT in node set, it is a perimeter node
-                m_perimeter_nodes.insert(n);
-                break;
-            }
+        auto neighbour_nodes = LevelGenerator::get_adjacents(n);
+
+        if (!m_nodes.contains(neighbour_nodes[0])) {
+            n.walls[0] = WALL_TYPE::WALL;
+            m_perimeter_nodes.insert(n);
+        }
+        if (!m_nodes.contains(neighbour_nodes[1])) {
+            n.walls[1] = WALL_TYPE::WALL;
+            m_perimeter_nodes.insert(n);
+        }
+        if (!m_nodes.contains(neighbour_nodes[2])) {
+            n.walls[2] = WALL_TYPE::WALL;
+            m_perimeter_nodes.insert(n);
+        }
+        if (!m_nodes.contains(neighbour_nodes[3])) {
+            n.walls[3] = WALL_TYPE::WALL;
+            m_perimeter_nodes.insert(n);
         }
     }
+
 }
 
 bool Room::neighbours(Room const & other) const
@@ -53,6 +65,14 @@ std::vector<Node> LevelGenerator::GenerateLevel(int32 num_nodes, int32 num_rooms
     spawn_node_set(nodes, num_nodes, seed);
 
     auto rooms = generate_rooms(nodes, num_rooms, seed);
+
+    nodes.clear();
+
+    for ( auto & room : rooms ) {
+        for ( auto & n : room.m_nodes ) {
+            nodes.insert(n);
+        }
+    }
 
     return nodes.to_vector();
 }
@@ -105,6 +125,7 @@ ESet<Room> LevelGenerator::generate_rooms(ESet<Node>& node_set, int32 num_rooms,
     ESet<std::pair<ESet<Node>, int>> seed_rooms(target_num_rooms,
                                                 std::make_pair<ESet<Node>, int>({(unsigned)seed},0));
 
+    /** Select nodes that will be seeds of rooms **/
     unsigned count = 0;
     while (count < target_num_rooms) {
         auto node = node_set.get_random();
@@ -133,7 +154,7 @@ ESet<Room> LevelGenerator::generate_rooms(ESet<Node>& node_set, int32 num_rooms,
         auto & seed_nodes = seed_node.first;
 
 
-        /** Get nodes **/
+        /** Get perimeter nodes **/
         int min_x = seed_nodes[0].x - current_radius;
         int max_x = seed_nodes[0].x + current_radius;
 
@@ -158,6 +179,7 @@ ESet<Room> LevelGenerator::generate_rooms(ESet<Node>& node_set, int32 num_rooms,
             new_nodes.insert(two);
         }
 
+        /** Add to room if not already in another room & are connected to this room (not diagonally) **/
         int last_node_count = 0;
         while (!new_nodes.empty() && new_nodes.size() != last_node_count) {
             last_node_count = new_nodes.size();
@@ -184,31 +206,7 @@ ESet<Room> LevelGenerator::generate_rooms(ESet<Node>& node_set, int32 num_rooms,
 
     UE_LOG(LogTemp, Warning, TEXT("Total room count: %u"), node_set.size());
 
-    /** Place walls along perimeter of rooms **/
-    for (auto & seed_obj : seed_rooms) {
-        auto & seed_set = seed_obj.first;
-        for (auto & node : seed_set) {
-            auto adjacents = get_adjacents(node);
-
-            if (!seed_set.contains(adjacents[0])) {
-                node.walls[0] = WALL_TYPE::WALL;
-            }
-            if (!seed_set.contains(adjacents[1])) {
-                node.walls[1] = WALL_TYPE::WALL;
-            }
-            if (!seed_set.contains(adjacents[2])) {
-                node.walls[2] = WALL_TYPE::WALL;
-            }
-            if (!seed_set.contains(adjacents[3])) {
-                node.walls[3] = WALL_TYPE::WALL;
-            }
-
-            node_set.insert(node);
-        }
-    }
-
     ESet<Room> rooms;
-
     for (auto const& seed_obj : seed_rooms) {
         rooms.insert(Room(seed_obj.first));
     }
@@ -223,7 +221,9 @@ void LevelGenerator::place_doors(ESet<Room>& rooms)
 
     ESet<Door> all_doors;
 
+    // TODO need to check evaluated rooms?
 
+    // to for each room, look at neighbours and pick a random room to add.
 
     // for (int i = 0; i < seed_rooms.size(); i++) {
     //     for (int j = 0; j < seed_rooms.size(); j++) {

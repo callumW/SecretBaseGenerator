@@ -71,8 +71,16 @@ public:
 
 	bool neighbours(Room const & other) const;
 
+	/**
+	 * Get node contained within the room that neighbours the passed node
+	 * @param n node external to this room but adjacent to the perimeter of the room
+	 * @returns neighbour node
+	 * @throws std::invalid_argument if n is not neighbouring any node in the room
+	 */
+	Node& get_neighbour(Node const & n);
+
 	bool operator==(Room const& other) const;
-private:
+
 	ESet<Node> m_nodes;
 	ESet<Node> m_perimeter_nodes;
 };
