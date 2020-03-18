@@ -70,7 +70,7 @@ std::pair<Node*, Node*> Room::get_neighbouring_nodes(Room & other)
     Node* other_node = nullptr;
     while (other_node == nullptr) {
         this_node = &m_perimeter_nodes.get_random();
-        other_node = get_neighbour(*this_node);
+        other_node = other.get_neighbour(*this_node);
     }
 
     return std::make_pair(this_node, other_node);
@@ -97,7 +97,7 @@ std::vector<Node> LevelGenerator::GenerateLevel(int32 num_nodes, int32 num_rooms
 
     auto rooms = generate_rooms(nodes, num_rooms, seed);
 
-    place_doors(rooms);
+    auto update_nodes = place_doors(rooms);
 
     nodes.clear();
 
@@ -105,10 +105,10 @@ std::vector<Node> LevelGenerator::GenerateLevel(int32 num_nodes, int32 num_rooms
         for ( auto & n : room.m_nodes ) {
             nodes.insert(n);
         }
+    }
 
-        for ( auto & n : room.m_perimeter_nodes ) {
-            nodes.replace(n);
-        }
+    for ( auto & node : update_nodes ) {
+        nodes.replace(node);
     }
 
     return nodes.to_vector();
@@ -251,7 +251,7 @@ ESet<Room> LevelGenerator::generate_rooms(ESet<Node>& node_set, int32 num_rooms,
     return rooms;
 }
 
-void LevelGenerator::place_doors(ESet<Room>& rooms)
+ESet<Node> LevelGenerator::place_doors(ESet<Room>& rooms)
 {
 
     UE_LOG(LogTemp, Warning, TEXT("Calculating doors"));
@@ -290,6 +290,7 @@ void LevelGenerator::place_doors(ESet<Room>& rooms)
         }
     }
 
+    ESet<Node> updated_nodes;
     for (auto & door : all_doors) {
         if (door.node_a->x > door.node_b->x) {    // node a is north
             door.node_a->walls[2] = WALL_TYPE::DOOR;
@@ -308,11 +309,15 @@ void LevelGenerator::place_doors(ESet<Room>& rooms)
             door.node_b->walls[3] = WALL_TYPE::DOOR;
         }
 
-        door.room_a->m_perimeter_nodes.replace(*door.node_a);
-        door.room_b->m_perimeter_nodes.replace(*door.node_b);
+        updated_nodes.insert(*door.node_a);
+        updated_nodes.insert(*door.node_b);
+        //door.room_a->m_perimeter_nodes.replace(*door.node_a);
+        //door.room_b->m_perimeter_nodes.replace(*door.node_b);
     }
 
     UE_LOG(LogTemp, Display, TEXT("Number of doors: %d"), all_doors.size());
+
+    return updated_nodes;
 }
 
 }

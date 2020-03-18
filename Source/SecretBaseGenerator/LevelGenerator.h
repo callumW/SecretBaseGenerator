@@ -102,7 +102,7 @@ public:
 private:
 	void spawn_node_set(ESet<Node>& node_set, int32 num_nodes, int32 seed);
 	ESet<Room> generate_rooms(ESet<Node>& node_set, int32 num_rooms, int32 seed);
-	void place_doors(ESet<Room>& rooms);
+	ESet<Node> place_doors(ESet<Room>& rooms);
 };
 
 }
