@@ -113,8 +113,6 @@ public:
 				std::uniform_int_distribution<> dist(0, m_vec.size() - 1);
 				i = dist(m_rand_engine);
 			}
-
-			UE_LOG(LogTemp, Warning, TEXT("returning index: %d"), i);
 			return m_vec[i];
 		}
 		else {

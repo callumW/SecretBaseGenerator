@@ -157,14 +157,12 @@ std::vector<Node> LevelGenerator::get_adjacents(Node n)
 ESet<Room> LevelGenerator::generate_rooms(ESet<Node>& node_set, int32 num_rooms, int32 seed)
 {
 
-    const unsigned target_num_rooms = 5;
-
-    ESet<std::pair<ESet<Node>, int>> seed_rooms(target_num_rooms,
+    ESet<std::pair<ESet<Node>, int>> seed_rooms(num_rooms,
                                                 std::make_pair<ESet<Node>, int>({(unsigned)seed},0));
 
     /** Select nodes that will be seeds of rooms **/
     unsigned count = 0;
-    while (count < target_num_rooms) {
+    while (count < num_rooms) {
         auto node = node_set.get_random();
         auto & seed_set = seed_rooms[count].first;
 
