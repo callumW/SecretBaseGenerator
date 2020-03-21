@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Math/Color.h"
 
 #include "ESet.h"
 #include <vector>
 #include <cstring>
+#include <tuple>
 
 namespace LevelGeneration {
 
@@ -29,6 +31,8 @@ typedef struct Node {
 
 	NODE_TYPE type = NODE_TYPE::ROOM;
 
+	FColor color = FColor(255, 0, 0, 255);
+
 	Node(int x_val, int y_val)
 	{
 		x = x_val;
@@ -46,12 +50,13 @@ typedef struct Node {
 		y = other.y;
 		std::memcpy((void*) walls, (void const*) other.walls, sizeof(WALL_TYPE) * 4);
 		type = other.type;
+		color = other.color;
 	}
 } Node;
 
 class Room {
 public:
-	Room(ESet<Node> const & nodes);
+	Room(ESet<Node> const & nodes, FColor const color = FColor());
 
 	bool neighbours(Room const & other) const;
 
@@ -69,6 +74,8 @@ public:
 
 	ESet<Node> m_nodes;
 	ESet<Node> m_perimeter_nodes;
+
+	FColor color;
 };
 
 typedef struct Door {
@@ -103,6 +110,9 @@ private:
 	void spawn_node_set(ESet<Node>& node_set, int32 num_nodes, int32 seed);
 	ESet<Room> generate_rooms(ESet<Node>& node_set, int32 num_rooms, int32 seed);
 	ESet<Node> place_doors(ESet<Room>& rooms);
+
+	std::tuple<std::vector<struct FColor>, size_t, size_t> to_image(ESet<Node>& node_set);
+	void output_to_file(ESet<Node>& node_set, TCHAR const * name);
 };
 
 }
