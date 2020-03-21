@@ -1,12 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
+#include "LevelGenerator.h"
 
 #include "HAL/PlatformFilemanager.h"
 #include "Misc/FileHelper.h"
+#include "Misc/Paths.h"
 
 #include <unordered_map>
 #include <cinttypes>
+#include <cassert>
 
-#include "LevelGenerator.h"
 #include "ESet.h"
 
 namespace LevelGeneration {
@@ -173,7 +175,7 @@ std::vector<Node> LevelGenerator::get_adjacents(Node n)
 static FColor random_color(int32 seed)
 {
     static std::mt19937 m_rand_engine(seed);
-    static std::uniform_int_distribution<uint8> dist(0, 255);
+    static std::uniform_int_distribution<short> dist(0, 255);
 
     return FColor(dist(m_rand_engine), dist(m_rand_engine), dist(m_rand_engine), 255);
 
@@ -186,7 +188,7 @@ ESet<Room> LevelGenerator::generate_rooms(ESet<Node>& node_set, int32 num_rooms,
                                                 std::make_pair<ESet<Node>, int>({(unsigned)seed},0));
 
     /** Select nodes that will be seeds of rooms **/
-    unsigned count = 0;
+    int32 count = 0;
     while (count < num_rooms) {
         auto node = node_set.get_random();
         auto & seed_set = seed_rooms[count].first;
