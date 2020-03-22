@@ -25,27 +25,21 @@ void ARoomSpawner::BeginPlay()
 	float const xOffset = 1000.0f;
 	float const yOffset = 1000.0f;
 
-	try {
-		LevelGeneration::LevelGenerator genie;
+	LevelGeneration::LevelGenerator genie;
 
-		auto nodes = genie.GenerateLevel(num_of_nodes, num_rooms_per_level, seed);
+	auto nodes = genie.GenerateLevel(num_of_nodes, num_rooms_per_level, seed);
 
-		for (auto & node : nodes) {
-			if (node.type == LevelGeneration::NODE_TYPE::ROOM) {
-				FVector location(node.x * xOffset, node.y * yOffset, height);
-				ARoom* tmp = (ARoom*) GetWorld()->SpawnActor(ARoom::StaticClass());
-				tmp->Initialize(node);
-				tmp->SetActorLocation(location);
-				rooms.Add(tmp);
-			}
-			else if (node.type == LevelGeneration::NODE_TYPE::STAIR_WELL) {
-				
-			}
+	for (auto & node : nodes) {
+		if (node.type == LevelGeneration::NODE_TYPE::ROOM) {
+			FVector location(node.x * xOffset, node.y * yOffset, height);
+			ARoom* tmp = (ARoom*) GetWorld()->SpawnActor(ARoom::StaticClass());
+			tmp->Initialize(node);
+			tmp->SetActorLocation(location);
+			rooms.Add(tmp);
 		}
-	}
-	catch(std::exception const& e) {
-		auto err_str = FString(e.what());
-		UE_LOG(LogTemp, Warning, TEXT("Caught exception: %s"), *err_str);
+		else if (node.type == LevelGeneration::NODE_TYPE::STAIR_WELL) {
+
+		}
 	}
 }
 
