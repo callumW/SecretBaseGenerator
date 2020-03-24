@@ -98,6 +98,7 @@ LevelGenerator::~LevelGenerator()
 
 std::vector<Node> LevelGenerator::GenerateLevel(int32 num_nodes, int32 num_rooms, int32 seed)
 {
+    // TODO validate input
     ESet<Node> nodes((unsigned) seed);
 
     spawn_node_set(nodes, num_nodes, seed);
@@ -145,7 +146,7 @@ void LevelGenerator::spawn_node_set(ESet<Node>& node_set, int32 num_nodes, int32
     adjacent_room_set.insert(Node(-1, 0));
     adjacent_room_set.insert(Node(0, -1));
 
-    uint8 count = 1;
+    int32 count = 1;
     while (count <= num_nodes) {
         // pick random room
         auto current_room = adjacent_room_set.get_random();
@@ -230,19 +231,9 @@ ESet<Room> LevelGenerator::generate_rooms(ESet<Node>& node_set, int32 num_rooms,
         ESet<Node> new_nodes((unsigned)seed);
 
         for (int x = min_x; x <= max_x; x++) {
-            Node one(x, min_y);
-            Node two(x, max_y);
-
-            new_nodes.insert(one);
-            new_nodes.insert(two);
-        }
-
-        for (int y = min_y; y <= max_y; y++) {
-            Node one(min_x, y);
-            Node two(max_x, y);
-
-            new_nodes.insert(one);
-            new_nodes.insert(two);
+            for (int y = min_y; y <= max_y; y++) {
+                new_nodes.insert(Node(x, y));
+            }
         }
 
         /** Add to room if not already in another room & are connected to this room (not diagonally) **/
@@ -354,10 +345,12 @@ ESet<Node> LevelGenerator::place_doors(ESet<Room>& rooms)
         door.node_a->color = FColor(255, 255, 255, 255);
         door.node_b->color = FColor(255, 255, 255, 255);
 
-        updated_nodes.insert(*door.node_a);
-        updated_nodes.insert(*door.node_b);
-        //door.room_a->m_perimeter_nodes.replace(*door.node_a);
-        //door.room_b->m_perimeter_nodes.replace(*door.node_b);
+        /*
+            Need to replace as there might already be a door on the node in the list. In which case
+            we need to update it to include the new doorway too.
+        */
+        updated_nodes.replace(*door.node_a);
+        updated_nodes.replace(*door.node_b);
     }
 
     UE_LOG(LogTemp, Display, TEXT("Number of doors: %d"), all_doors.size());
