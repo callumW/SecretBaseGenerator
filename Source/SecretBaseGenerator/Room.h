@@ -59,6 +59,7 @@ private:
 	void LoadWall(FVector loc, FRotator rotation, FName name, LevelGeneration::WALL_TYPE const type);
 	void LoadCeiling();
 	void LoadLight();
+	void LoadStairWell();
 
 	TArray<USceneComponent*> meshes;
 };

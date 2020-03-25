@@ -113,15 +113,45 @@ void ARoom::LoadLight()
 	light->SetRelativeLocation(FVector(0.0f, 0.0f, 235.0f), false);
 }
 
+void ARoom::LoadStairWell()
+{
+	auto stairwell_mesh = NewObject<UStaticMeshComponent>(this, UStaticMeshComponent::StaticClass(), TEXT("stairwell"));
+	meshes.Add(stairwell_mesh);
+
+	UStaticMesh* mesh_asset = (UStaticMesh*) StaticLoadObject(UStaticMesh::StaticClass(), nullptr, TEXT("StaticMesh'/Game/Models/stair_well_no_wall.stair_well_no_wall'"));
+
+	if (mesh_asset) {
+		stairwell_mesh->SetStaticMesh(mesh_asset);
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("failed to create mesh asset"));
+	}
+
+	stairwell_mesh->RegisterComponent();
+
+	if (RootComponent) {
+		stairwell_mesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("Not attaching wall"));
+	}
+}
+
 void ARoom::Initialize(LevelGeneration::Node const& block)
 {
-	LoadWall(FVector(495.0f, 0.0, 137.5f), FRotator(0.0f, 180.0f, 0.0f), "front wall", block.walls[0]);
-	LoadWall(FVector(0.0f, 495.0f, 137.5f), FRotator(0.0f, -90.0f, 0.0f), "right wall", block.walls[1]);
-	LoadWall(FVector(-495.0f, 0.0f, 137.5f), FRotator(0.0f, 0.0f, 0.0f), "back wall", block.walls[2]);
-	LoadWall(FVector(0.0f, -495.0f, 137.5f), FRotator(0.0f, 90.0f, 0.0f), "left wall", block.walls[3]);
+	if (block.type == LevelGeneration::NODE_TYPE::ROOM) {
+		LoadWall(FVector(495.0f, 0.0, 137.5f), FRotator(0.0f, 180.0f, 0.0f), "front wall", block.walls[0]);
+		LoadWall(FVector(0.0f, 495.0f, 137.5f), FRotator(0.0f, -90.0f, 0.0f), "right wall", block.walls[1]);
+		LoadWall(FVector(-495.0f, 0.0f, 137.5f), FRotator(0.0f, 0.0f, 0.0f), "back wall", block.walls[2]);
+		LoadWall(FVector(0.0f, -495.0f, 137.5f), FRotator(0.0f, 90.0f, 0.0f), "left wall", block.walls[3]);
 
-	LoadCeiling();
-	LoadLight();
+		LoadCeiling();
+		LoadLight();
+	}
+	else if (block.type == LevelGeneration::NODE_TYPE::STAIR_WELL) {
+		UE_LOG(LogTemp, Display, TEXT("STAIRWELL!"));
+		LoadStairWell();
+	}
 }
 
 // Called when the game starts or when spawned

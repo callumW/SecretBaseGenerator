@@ -3,6 +3,7 @@
 #pragma once
 
 #include <utility>
+#include <random>
 
 #include "Room.h"
 #include "ESet.h"
@@ -30,6 +31,9 @@ public:
 	int32 num_of_nodes = 100;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 num_of_levels = 3;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float height = 0.0f;
 
 protected:
@@ -43,4 +47,6 @@ public:
 private:
 
 	TArray<AActor*> rooms;
+
+	std::mt19937 m_rand_engine;
 };

@@ -130,6 +130,10 @@ std::vector<Node> LevelGenerator::GenerateLevel(int32 num_nodes, int32 num_rooms
         output_to_file(nodes, *(file_name + "_rooms.bmp"));
     }
 
+    auto it = nodes.where_is(Node(0, 0));
+
+    (*it.first).type = NODE_TYPE::STAIR_WELL;
+
     return nodes.to_vector();
 }
 
@@ -139,7 +143,10 @@ void LevelGenerator::spawn_node_set(ESet<Node>& node_set, int32 num_nodes, int32
         throw std::invalid_argument("LevelGenerator::spawn_node_set: num_nodes <= 0");
     }
     ESet<Node> adjacent_room_set{(unsigned)seed};
-    node_set.insert(Node(0, 0));	// add origin so player doesn't fall!
+
+    auto origin = Node(0, 0);
+    origin.type = NODE_TYPE::STAIR_WELL;
+    node_set.insert(origin);	// add origin so player doesn't fall!
 
     adjacent_room_set.insert(Node(1, 0));
     adjacent_room_set.insert(Node(0, 1));
