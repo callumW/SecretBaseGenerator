@@ -60,6 +60,7 @@ private:
 	void LoadCeiling();
 	void LoadLight();
 	void LoadStairWell();
+	void LoadFloor();
 
 	TArray<USceneComponent*> meshes;
 };

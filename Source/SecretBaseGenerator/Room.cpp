@@ -12,19 +12,30 @@ ARoom::ARoom()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
-	auto floor = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("floor mesh"));
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("room_root"));
+}
+
+void ARoom::LoadFloor()
+{
+	auto floor = NewObject<UStaticMeshComponent>(this, UStaticMeshComponent::StaticClass(), TEXT("floor mesh"));
 
 	if (floor) {
-		RootComponent = floor;
+		meshes.Add(floor);
 
-		ConstructorHelpers::FObjectFinder<UStaticMesh> mesh_asset(TEXT("StaticMesh'/Game/Models/floor.floor'"));
+		UStaticMesh* mesh_asset = (UStaticMesh*) StaticLoadObject(UStaticMesh::StaticClass(), nullptr, TEXT("StaticMesh'/Game/Models/floor.floor'"));
 
-		if (mesh_asset.Succeeded()) {
-			floor->SetStaticMesh(mesh_asset.Object);
+		if (mesh_asset) {
+			floor->SetStaticMesh(mesh_asset);
 		}
 		else {
 			UE_LOG(LogTemp, Warning, TEXT("failed to create mesh asset"));
 		}
+
+		floor->RegisterComponent();
+		floor->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("failed to create floor"));
 	}
 }
 
@@ -133,6 +144,7 @@ void ARoom::LoadStairWell()
 		stairwell_mesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	}
 	else {
+		RootComponent = stairwell_mesh;
 		UE_LOG(LogTemp, Warning, TEXT("Not attaching wall"));
 	}
 }
@@ -140,6 +152,7 @@ void ARoom::LoadStairWell()
 void ARoom::Initialize(LevelGeneration::Node const& block)
 {
 	if (block.type == LevelGeneration::NODE_TYPE::ROOM) {
+		LoadFloor();
 		LoadWall(FVector(495.0f, 0.0, 137.5f), FRotator(0.0f, 180.0f, 0.0f), "front wall", block.walls[0]);
 		LoadWall(FVector(0.0f, 495.0f, 137.5f), FRotator(0.0f, -90.0f, 0.0f), "right wall", block.walls[1]);
 		LoadWall(FVector(-495.0f, 0.0f, 137.5f), FRotator(0.0f, 0.0f, 0.0f), "back wall", block.walls[2]);
