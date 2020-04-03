@@ -1,4 +1,4 @@
-# SecretBaseGenerator
+# SecretBaseGenerator (Work In Progress)
 ![MIT License](https://img.shields.io/github/license/callumW/SecretBaseGenerator)
 ![Version](https://img.shields.io/github/v/release/callumW/SecretBaseGenerator?include_prereleases)
 
