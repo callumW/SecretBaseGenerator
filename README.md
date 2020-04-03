@@ -12,6 +12,12 @@ base (think Black Mesa from Half-Life).**
 The generation part of this should be module enough so it can be made into a little library. Perhaps
 it could even be agnostic of game engine.
 
+## Current Status
+At the moment the game simply generates a set of rooms
+
+### Screenshots
+![game screenshot](screenshots/screenshot1.png)
+
 ## Contributing
 Currently I have not made plans yet for contributions but anyone is welcome to create issues (either
 about code, a feature request, anything!), and make pull requests. It would be a good idea to post
