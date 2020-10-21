@@ -16,6 +16,7 @@ it could even be agnostic of game engine.
 At the moment the game simply generates a set of rooms
 
 ### Screenshots
+Video demo: https://youtu.be/1cxAHuMUg9w
 ![game screenshot](screenshots/screenshot1.png)
 
 ## Contributing
